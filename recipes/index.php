@@ -1,5 +1,5 @@
 <?php
-require 'database.php';  // DB connection
+require '../database.php';  // DB connection
 
 $search_term = '';
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {

@@ -1,0 +1,17 @@
+/* Override boostrap */
+
+body {
+  line-height: unset !important;
+}
+
+.dropdown {
+  position: unset !important;
+}
+
+form {
+  display: block;
+}
+
+h2 {
+  margin-bottom: auto;
+}
