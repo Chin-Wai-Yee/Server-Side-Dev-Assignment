@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- 主机： 127.0.0.1
--- 生成日期： 2025-04-11 17:16:47
--- 服务器版本： 10.4.32-MariaDB
--- PHP 版本： 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Apr 12, 2025 at 07:27 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,15 +18,46 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 数据库： `recipe_culinary`
---
+-- Database: `recipe_culinary`
+
 CREATE DATABASE IF NOT EXISTS `recipe_culinary` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `recipe_culinary`;
+--
 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `competitions`
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `discussion_id` int(11) NOT NULL,
+  `parent_comment_id` int(11) DEFAULT NULL,
+  `content` text NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments_vote`
+--
+
+CREATE TABLE `comments_vote` (
+  `vote_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `vote_value` tinyint(1) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `competitions`
 --
 
 CREATE TABLE `competitions` (
@@ -41,7 +72,7 @@ CREATE TABLE `competitions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `competitions`
+-- Dumping data for table `competitions`
 --
 
 INSERT INTO `competitions` (`id`, `title`, `description`, `start_date`, `end_date`, `voting_end_date`, `status`, `created_at`) VALUES
@@ -51,7 +82,7 @@ INSERT INTO `competitions` (`id`, `title`, `description`, `start_date`, `end_dat
 -- --------------------------------------------------------
 
 --
--- 表的结构 `competition_recipes`
+-- Table structure for table `competition_recipes`
 --
 
 CREATE TABLE `competition_recipes` (
@@ -62,7 +93,7 @@ CREATE TABLE `competition_recipes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `competition_recipes`
+-- Dumping data for table `competition_recipes`
 --
 
 INSERT INTO `competition_recipes` (`id`, `competition_id`, `recipe_id`, `submitted_at`) VALUES
@@ -75,7 +106,24 @@ INSERT INTO `competition_recipes` (`id`, `competition_id`, `recipe_id`, `submitt
 -- --------------------------------------------------------
 
 --
--- 表的结构 `recipes`
+-- Table structure for table `discussions`
+--
+
+CREATE TABLE `discussions` (
+  `discussion_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `recipe_id` int(11) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `media_path` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `recipes`
 --
 
 CREATE TABLE `recipes` (
@@ -89,7 +137,7 @@ CREATE TABLE `recipes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `recipes`
+-- Dumping data for table `recipes`
 --
 
 INSERT INTO `recipes` (`recipe_id`, `user_id`, `title`, `ingredients`, `instructions`, `cuisine_type`, `image_path`) VALUES
@@ -102,11 +150,25 @@ INSERT INTO `recipes` (`recipe_id`, `user_id`, `title`, `ingredients`, `instruct
 -- --------------------------------------------------------
 
 --
--- 表的结构 `users`
+-- Table structure for table `recipe_ratings`
+--
+
+CREATE TABLE `recipe_ratings` (
+  `rating_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `recipe_id` int(11) NOT NULL,
+  `rating` tinyint(4) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -116,10 +178,10 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `users`
+-- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password`, `profile_image`, `bio`, `created_at`) VALUES
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `profile_image`, `bio`, `created_at`) VALUES
 (1, 'chef_anna', 'anna@example.com', 'hashed_password1', 'anna.jpg', 'Passionate home cook and food blogger.', '2025-04-11 15:10:51'),
 (2, 'chef_bob', 'bob@example.com', 'hashed_password2', 'bob.jpg', 'Professional chef specializing in Italian cuisine.', '2025-04-11 15:10:51'),
 (3, 'chef_clara', 'clara@example.com', 'hashed_password3', 'clara.jpg', 'Baking enthusiast and cookbook author.', '2025-04-11 15:10:51'),
@@ -129,7 +191,7 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `profile_image`, `bi
 -- --------------------------------------------------------
 
 --
--- 表的结构 `votes`
+-- Table structure for table `votes`
 --
 
 CREATE TABLE `votes` (
@@ -140,7 +202,7 @@ CREATE TABLE `votes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `votes`
+-- Dumping data for table `votes`
 --
 
 INSERT INTO `votes` (`id`, `recipe_id`, `user_id`, `created_at`) VALUES
@@ -151,17 +213,34 @@ INSERT INTO `votes` (`id`, `recipe_id`, `user_id`, `created_at`) VALUES
 (5, 4, 5, '2025-04-11 15:15:35');
 
 --
--- 转储表的索引
+-- Indexes for dumped tables
 --
 
 --
--- 表的索引 `competitions`
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `comments_ibfk_2` (`discussion_id`),
+  ADD KEY `comments_ibfk_3` (`parent_comment_id`),
+  ADD KEY `comments_ibfk_1` (`user_id`);
+
+--
+-- Indexes for table `comments_vote`
+--
+ALTER TABLE `comments_vote`
+  ADD PRIMARY KEY (`vote_id`),
+  ADD UNIQUE KEY `unique_vote` (`user_id`,`comment_id`),
+  ADD KEY `comments_vote_ibfk_2` (`comment_id`);
+
+--
+-- Indexes for table `competitions`
 --
 ALTER TABLE `competitions`
   ADD PRIMARY KEY (`id`);
 
 --
--- 表的索引 `competition_recipes`
+-- Indexes for table `competition_recipes`
 --
 ALTER TABLE `competition_recipes`
   ADD PRIMARY KEY (`id`),
@@ -169,22 +248,38 @@ ALTER TABLE `competition_recipes`
   ADD KEY `recipe_id` (`recipe_id`);
 
 --
--- 表的索引 `recipes`
+-- Indexes for table `discussions`
+--
+ALTER TABLE `discussions`
+  ADD PRIMARY KEY (`discussion_id`),
+  ADD KEY `discussions_ibfk_1` (`user_id`),
+  ADD KEY `discussions_ibfk_2` (`recipe_id`);
+
+--
+-- Indexes for table `recipes`
 --
 ALTER TABLE `recipes`
   ADD PRIMARY KEY (`recipe_id`),
   ADD KEY `recipes_ibfk_1` (`user_id`);
 
 --
--- 表的索引 `users`
+-- Indexes for table `recipe_ratings`
+--
+ALTER TABLE `recipe_ratings`
+  ADD PRIMARY KEY (`rating_id`),
+  ADD UNIQUE KEY `unique_user_recipe` (`user_id`,`recipe_id`),
+  ADD KEY `recipe_id` (`recipe_id`);
+
+--
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- 表的索引 `votes`
+-- Indexes for table `votes`
 --
 ALTER TABLE `votes`
   ADD PRIMARY KEY (`id`),
@@ -192,64 +287,97 @@ ALTER TABLE `votes`
   ADD KEY `user_id` (`user_id`);
 
 --
--- 在导出的表使用AUTO_INCREMENT
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- 使用表AUTO_INCREMENT `competitions`
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `comments_vote`
+--
+ALTER TABLE `comments_vote`
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `competitions`
 --
 ALTER TABLE `competitions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- 使用表AUTO_INCREMENT `competition_recipes`
+-- AUTO_INCREMENT for table `competition_recipes`
 --
 ALTER TABLE `competition_recipes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- 使用表AUTO_INCREMENT `recipes`
+-- AUTO_INCREMENT for table `discussions`
+--
+ALTER TABLE `discussions`
+  MODIFY `discussion_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `recipes`
 --
 ALTER TABLE `recipes`
   MODIFY `recipe_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
--- 使用表AUTO_INCREMENT `users`
+-- AUTO_INCREMENT for table `recipe_ratings`
 --
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+ALTER TABLE `recipe_ratings`
+  MODIFY `rating_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 使用表AUTO_INCREMENT `votes`
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- 限制导出的表
+-- Constraints for dumped tables
 --
 
 --
--- 限制表 `competition_recipes`
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`discussion_id`) REFERENCES `discussions` (`discussion_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_3` FOREIGN KEY (`parent_comment_id`) REFERENCES `comments` (`comment_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `competition_recipes`
 --
 ALTER TABLE `competition_recipes`
   ADD CONSTRAINT `competition_recipes_ibfk_1` FOREIGN KEY (`competition_id`) REFERENCES `competitions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `competition_recipes_ibfk_2` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`recipe_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- 限制表 `recipes`
+-- Constraints for table `recipes`
 --
 ALTER TABLE `recipes`
-  ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- 限制表 `votes`
+-- Constraints for table `votes`
 --
 ALTER TABLE `votes`
   ADD CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `competition_recipes` (`id`),
-  ADD CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
