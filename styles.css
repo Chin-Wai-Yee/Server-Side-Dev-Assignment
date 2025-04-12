@@ -114,7 +114,8 @@ nav ul li a {
     text-decoration: none;
     font-size: 1.1em;
     font-family: 'Didot', serif;
-    padding: 10px 15px;
+    text-align: center;
+    /* padding: 10px 15px; */
     display: block;
 }
 

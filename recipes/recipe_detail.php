@@ -1,5 +1,5 @@
 <?php
-require 'database.php';
+require '../database.php';
 
 if (!isset($_GET['recipe_id'])) {
     echo "Invalid recipe ID";
