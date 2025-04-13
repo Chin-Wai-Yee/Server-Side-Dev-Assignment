@@ -12,7 +12,7 @@ require_once 'User.php';
 
 // Create user object
 $user = new User();
-$user->id = $_SESSION['user_id'];
+$user->user_id = $_SESSION['user_id'];
 
 // Load user data
 $user->read_single();
