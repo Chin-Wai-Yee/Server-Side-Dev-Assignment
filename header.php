@@ -7,7 +7,7 @@
     <nav>
         <ul>
             <?php $base_path = '/recipe culinary'; ?>
-            <li> <a href="<?= $base_path ?>/index.php">Home</a> </li>
+            <li> <a href="<?= $base_path ?>">Home</a> </li>
             <div class="dropdown">
                 <li> <a href="<?= $base_path ?>/recipes">Recipes</a> </li>
                 <div class="dropdown-content">
@@ -19,17 +19,7 @@
             </div>
             <li> <a href="<?= $base_path ?>/meal_planning.php">Meal Planning</a> </li>
             <li> <a href="<?= $base_path ?>/community/discussions/list.php">Community</a> </li>
-            
-            <div class="dropdown">
-                <li> <a href="<?= $base_path ?>/cooking_competition">Cooking Competition</a> </li>
-                
-                <!-- <div class="dropdown-content">
-                    <a href="<?= $base_path ?>/cooking_competition">Create Recipe</a>
-                    <a href="<?= $base_path ?>/cooking_competition">Edit Recipe</a>
-                    <a href="<?= $base_path ?>/cooking_competition">Delete Recipe</a>
-                    <a href="<?= $base_path ?>/cooking_competition">Search Recipe</a>
-                </div> -->
-            </div>
+            <li> <a href="<?= $base_path ?>/cooking_competition">Cooking Competition</a> </li>
 
             <!-- Check if the user is logged in -->
             <div class="dropdown">
