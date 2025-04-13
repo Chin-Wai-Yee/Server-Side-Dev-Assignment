@@ -40,7 +40,7 @@ class Recipe {
                  (SELECT COUNT(*) FROM votes v WHERE v.recipe_id = cr.id) as vote_count
                  FROM {$this->comp_recipe_table} cr
                  JOIN {$this->table} r ON cr.recipe_id = r.recipe_id
-                 LEFT JOIN users u ON r.user_id = u.id
+                 LEFT JOIN users u ON r.user_id = u.user_id
                  WHERE cr.competition_id = ?
                  GROUP BY cr.id
                  ORDER BY vote_count DESC";
@@ -64,7 +64,7 @@ class Recipe {
     public function get_by_id($recipe_id) {
         $query = "SELECT r.*, u.username 
                  FROM {$this->table} r
-                 LEFT JOIN users u ON r.user_id = u.id
+                 LEFT JOIN users u ON r.user_id = u.user_id
                  WHERE r.recipe_id = ?
                  LIMIT 0,1";
         
@@ -85,7 +85,7 @@ class Recipe {
                  (SELECT COUNT(*) FROM votes v WHERE v.recipe_id = cr.id) as vote_count
                  FROM {$this->comp_recipe_table} cr
                  JOIN {$this->table} r ON cr.recipe_id = r.recipe_id
-                 LEFT JOIN users u ON r.user_id = u.id
+                 LEFT JOIN users u ON r.user_id = u.user_id
                  WHERE cr.competition_id = ? AND r.recipe_id = ?
                  LIMIT 0,1";
         
@@ -104,7 +104,7 @@ class Recipe {
     public function get_all() {
         $query = "SELECT r.*, u.username 
                  FROM {$this->table} r
-                 LEFT JOIN users u ON r.user_id = u.id
+                 LEFT JOIN users u ON r.user_id = u.user_id
                  ORDER BY r.recipe_id DESC";
         
         $result = $this->conn->query($query);
@@ -128,7 +128,7 @@ class Recipe {
                         LIMIT 1
                     ) as competition_name 
                     FROM {$this->table} r
-                    LEFT JOIN users u ON r.user_id = u.id
+                    LEFT JOIN users u ON r.user_id = u.user_id
                     WHERE r.user_id = ?
                     ORDER BY r.recipe_id DESC";
             

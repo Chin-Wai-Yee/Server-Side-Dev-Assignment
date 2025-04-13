@@ -1,29 +1,30 @@
 <?php
-// Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if form was submitted
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: register.php');
     exit;
 }
 
-// Include necessary files
 require_once '../database.php';
 require_once 'User.php';
 
-// Get form data
 $username = trim($_POST['username']);
 $email = trim($_POST['email']);
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
 $role = isset($_POST['role']) ? trim($_POST['role']) : 'user';
 
-// Validate input
 if (empty($username) || empty($email) || empty($password)) {
     $_SESSION['error'] = "All fields are required";
+    header("Location: register.php");
+    exit;
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['error'] = "Invalid email format";
     header("Location: register.php");
     exit;
 }
@@ -44,14 +45,12 @@ if (!in_array($role, ['admin', 'user'])) {
 // Create user object - will use the mysqli $conn from database.php
 $user = new User();
 
-// Check if username or email already exists
 if ($user->getUserByUsername($username) || $user->getUserByEmail($email)) {
     $_SESSION['error'] = "Username or email already exists";
     header("Location: register.php");
     exit;
 }
 
-// Hash password
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Create user

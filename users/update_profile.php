@@ -18,7 +18,7 @@ require_once 'User.php';
 
 // User object is already set up to use mysqli connection
 $user = new User();
-$user->id = $_SESSION['user_id'];
+$user->user_id = $_SESSION['user_id'];
 
 // Load current user data
 $user->read_single();
