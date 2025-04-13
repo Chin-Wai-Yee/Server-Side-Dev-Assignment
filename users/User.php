@@ -13,20 +13,19 @@ class User {
     public $profile_image;
     public $bio;
     public $created_at;
+    public $role;
     
     public function __construct() {
         global $conn;
         $this->conn = $conn;
     }
 
-    public function register($username, $email, $password) {
+    public function register($username, $email, $password, $role = 'user') {
         try {
             $stmt = $this->conn->prepare(
-                "INSERT INTO users " .
-                "(username, email, password, created_at) " .
-                "VALUES (?, ?, ?, NOW())"
+                "INSERT INTO users (username, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())"
             );
-            $stmt->bind_param("sss", $username, $email, $password);
+            $stmt->bind_param("ssss", $username, $email, $password, $role);
             return $stmt->execute();
         } catch (Exception $e) {
             // Log error
@@ -37,7 +36,7 @@ class User {
     
     // Login user
     public function login() {
-        $query = 'SELECT id, username, email, password 
+        $query = 'SELECT id, username, email, password, role 
                   FROM ' . $this->table . ' 
                   WHERE email = ? 
                   LIMIT 0,1';
@@ -51,6 +50,8 @@ class User {
             $row = $result->fetch_assoc();
             $this->id = $row['id'];
             $this->username = $row['username'];
+            $this->email = $row['email'];
+            $this->role = $row['role'];
             
             // Verify password
             if(password_verify($this->password, $row['password'])) {
@@ -78,6 +79,7 @@ class User {
             $this->profile_image = $row['profile_image'];
             $this->bio = $row['bio'];
             $this->created_at = $row['created_at'];
+            $this->role = $row['role'];
             return true;
         }
         

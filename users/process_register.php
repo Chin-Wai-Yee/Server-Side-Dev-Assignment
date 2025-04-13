@@ -19,6 +19,7 @@ $username = trim($_POST['username']);
 $email = trim($_POST['email']);
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
+$role = isset($_POST['role']) ? trim($_POST['role']) : 'user';
 
 // Validate input
 if (empty($username) || empty($email) || empty($password)) {
@@ -29,6 +30,13 @@ if (empty($username) || empty($email) || empty($password)) {
 
 if ($password !== $confirm_password) {
     $_SESSION['error'] = "Passwords do not match";
+    header("Location: register.php");
+    exit;
+}
+
+// Validate role
+if (!in_array($role, ['admin', 'user'])) {
+    $_SESSION['error'] = "Invalid role specified";
     header("Location: register.php");
     exit;
 }
@@ -47,7 +55,7 @@ if ($user->getUserByUsername($username) || $user->getUserByEmail($email)) {
 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 // Create user
-if ($user->register($username, $email, $hashed_password)) {
+if ($user->register($username, $email, $hashed_password, $role)) {
     $_SESSION['success'] = "Registration successful. Please log in.";
     header("Location: login.php");
     exit;

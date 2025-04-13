@@ -43,6 +43,7 @@ try {
         // Set user session data
         $_SESSION['user_id'] = $user->id;
         $_SESSION['username'] = $user->username;
+        $_SESSION['role'] = $user->role;
         
         // Regenerate session ID for security
         session_regenerate_id(true);
