@@ -526,3 +526,586 @@ footer {
 footer p {
     margin: 0;
 }
+
+/* -------------Community module styles ----------------- */
+body.community-page {
+    background-color: #1a1a1a;  /* Dark grey/black */
+    color: #ffffff;  /* White text */
+    min-height: 100vh;
+    margin: 0;
+}
+
+.community-header {
+    background-color: #2d2d2d;  /* Slightly lighter grey */
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 800px;  /* Control form width */
+    margin: 50px auto;  /* Center the form */
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.community-header .form-control {
+    background-color: #333;
+    border: 1px solid #444;
+    color: #fff;
+}
+
+.community-header .form-control:focus {
+    background-color: #404040;
+    border-color: #555;
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+}
+
+.community-header .action-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.community-header .action-button{
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    margin: 0 5px;
+    border-radius: 4px; 
+    transition: all 0.2s ease;
+    display: inline-block; 
+    min-width: 120px;    
+}
+
+.community-header .cancel-button {
+    background-color: #555 !important;
+    border: 1px solid #666;
+}
+
+/* Hover effects */
+.community-header .action-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Make both buttons consistent */
+.button-container .action-button {
+    padding: 8px 20px;        /* Uniform padding */
+    font-size: 0.9rem;        /* Same text size */
+    border-radius: 4px;       /* Matching corners */
+    text-decoration: none;    /* Remove underline from cancel link */
+    display: inline-flex;     /* Align icons and text */
+    align-items: center;      /* Vertical alignment */
+    gap: 8px;                /* Space between icon and text */
+    transition: all 0.2s ease;
+    min-width: 140px;         /* Same minimum width */
+    justify-content: center;  /* Center content */
+}
+
+/* Specific styles for cancel button */
+.button-container .cancel-button {
+    background-color: #dc3545 !important;  /* Red color */
+    border: 1px solid #dc3545;
+}
+
+/* Hover states */
+.button-container .action-button:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+/* Ensure <a> and <button> behave the same */
+.button-container .action-button {
+    box-sizing: border-box;
+    border: none;
+    cursor: pointer;
+}
+
+.button-container .action-button,
+.button-container .action-button:visited {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    min-width: 140px;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    height: 42px;
+    line-height: 1.2;
+}
+
+/* Optional: Set icon alignment if needed */
+.button-container .action-button i {
+    margin-right: 6px;
+}
+
+body.list-page {
+    background-color: #1a1a1a;  /* Dark grey/black */
+    color: #ffffff;  /* White text */
+    min-height: 100vh;
+    margin: 0;
+}
+
+body.view-page {
+    background-color: #1d1c1c;  /* Dark grey/black */
+    color: #ffffff;  /* White text */
+    min-height: 100vh;
+    margin: 0;
+}
+
+
+.rd-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.rd-discussion-card {
+    background-color: #1a1a1b;
+    border-radius: 20px;
+    border: 1px solid #343536;
+    margin-bottom: 20px;
+    overflow: hidden;
+    color: #d7dadc;
+}
+
+.rd-discussion-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #343536;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.rd-discussion-title {
+    padding: 12px 16px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #d7dadc;
+}
+
+.rd-discussion-content {
+    padding: 16px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #d7dadc;
+}
+
+.rd-discussion-footer {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #343536;
+    font-size: 0.9rem;
+}
+
+.rd-discussion-footer a {
+    color: #999;
+    text-decoration: none;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.rd-discussion-footer a:hover {
+    color: #d7dadc;
+}
+
+.rd-discussion-footer i {
+    margin-right: 6px;
+}
+
+.rd-comment-container {
+    margin-top: 20px;
+}
+
+.rd-comment-form {
+    background-color: #393737;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.rd-comment-form textarea {
+    width: 100%;
+    background-color: #1a1a1b;
+    border: 1px solid #343536;
+    border-radius: 4px;
+    padding: 12px;
+    color: #d7dadc;
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
+
+.rd-comment-form button {
+    background-color: #272729;
+    color: #d7dadc;
+    border: 1px solid #343536;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    float: right;
+}
+
+.rd-comment-form button:hover {
+    background-color: #3d3d3f;
+}
+
+.rd-comments-heading {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #343536;
+    color: #d7dadc;
+}
+
+.rd-comment-replies .rd-comment {
+    margin-top: 0 !important; /* Reset any prior alternating styles */
+}
+
+.rd-comment {
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.rd-vote-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 12px;
+}
+
+.rd-vote-controls a {
+    color: #999;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin: 2px 0;
+}
+
+.rd-vote-controls .rd-upvote:hover, .rd-vote-controls .rd-upvote.active {
+    color: #ff4500;
+}
+
+.rd-vote-controls .rd-downvote:hover, .rd-vote-controls .rd-downvote.active {
+    color: #7193ff;
+}
+
+.rd-vote-count {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 4px 0;
+    color: #d7dadc;
+}
+
+.rd-comment-body {
+    flex: 1;
+}
+
+.rd-comment-header {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: #353333;
+}
+
+.rd-comment-author {
+    font-weight: bold;
+    color: #d7dadc;
+}
+
+.rd-comment-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    color: #adadad;
+}
+
+.rd-comment-actions {
+    font-size: 0.75rem;
+}
+
+.rd-comment-actions a {
+    color: #999;
+    text-decoration: none;
+    margin-right: 12px;
+}
+
+.rd-comment-actions a:hover {
+    color: #d7dadc;
+}
+
+.rd-comment-replies {
+    margin-left: 24px;
+    border-left: 2px solid #343536;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.rd-related-recipe {
+    background-color: rgba(255, 69, 0, 0.1);
+    border: 1px solid rgba(255, 69, 0, 0.2);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.rd-related-recipe a {
+    color: #4fbcff;
+    text-decoration: none;
+}
+
+.rd-related-recipe a:hover {
+    text-decoration: underline;
+}
+
+.rd-sort-options {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.rd-sort-options span {
+    margin-right: 8px;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.rd-sort-options select {
+    background-color: #272729;
+    color: #d7dadc;
+    border: 1px solid #343536;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+}
+
+.rd-clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.rd-no-comments {
+    color: #999;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+.rd-reply-form {
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #1e1e1f;
+    border: 5px solid #4d4e4e;
+    border-radius: 4px;
+}
+
+.rd-reply-form textarea {
+    width: 100%;
+    min-height: 80px;
+    background-color: #1a1a1b;
+    color: #d7dadc;
+    border: 1px solid #343536;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.rd-reply-buttons {
+    text-align: right;
+}
+
+.rd-cancel-btn {
+    background-color: transparent;
+    border: none;
+    color: #999;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.rd-reply-btn {
+    background-color: #272729;
+    color: #d7dadc;
+    border: 1px solid #343536;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.rd-reply-btn:hover {
+    background-color: #3d3d3f;
+}
+
+
+.rd-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.rd-post-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rd-post-card {
+    display: flex;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.rd-post-card:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.rd-vote-column {
+    width: 40px;
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.rd-vote-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #878a8c;
+    font-size: 1.2rem;
+}
+
+.rd-vote-score {
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.rd-post-content {
+    flex: 1;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.rd-post-header {
+    margin-bottom: 8px;
+}
+
+.rd-post-title {
+    font-size: 1.2rem;
+    margin: 0 0 5px 0;
+    color: #1c1c1c;
+}
+
+.rd-post-metadata {
+    font-size: 0.8rem;
+    color: #787c7e;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.rd-user-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.rd-post-body {
+    display: flex;
+    gap: 15px;
+}
+
+.rd-post-text {
+    flex: 1;
+}
+
+.rd-post-media {
+    flex: 1;
+    max-width: 50%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.rd-post-media img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.rd-post-media video {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.rd-post-actions {
+    display: flex;
+    padding-top: 10px;
+    border-top: 1px solid #edeff1;
+    margin-top: 10px;
+    gap: 15px;
+}
+
+.rd-post-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #878a8c;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.rd-post-action:hover {
+    color: #1484D6;
+}
+
+.rd-new-post-button {
+    display: inline-block;
+    background-color: #0079d3;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.rd-new-post-button:hover {
+    background-color: #0061a9;
+}
+
+.rd-community-heading {
+    margin-bottom: 20px;
+}
+
+.rd-recipe-related {
+    font-size: 0.8rem;
+    margin-top: 5px;
+    padding: 3px 6px;
+    background-color: #f2f8fc;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .rd-post-body {
+        flex-direction: column;
+    }
+    
+    .rd-post-media {
+        max-width: 100%;
+    }
+}
