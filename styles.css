@@ -518,7 +518,6 @@ footer {
     text-align: center;
     padding: 20px;
     color: lightyellow;
-    position: fixed;
     width: 100%;
     bottom: 0;
 }
@@ -585,6 +584,7 @@ body.community-page {
 
 /* Make both buttons consistent */
 .button-container .action-button {
+    min-height: 200px;
     padding: 8px 20px;        /* Uniform padding */
     font-size: 0.9rem;        /* Same text size */
     border-radius: 4px;       /* Matching corners */
@@ -769,37 +769,10 @@ body.view-page {
 
 .rd-comment {
     display: flex;
-    margin-bottom: 24px;
+    margin-bottom: 8px;
+    align-items: flex-start;
 }
 
-.rd-vote-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right: 12px;
-}
-
-.rd-vote-controls a {
-    color: #999;
-    text-decoration: none;
-    font-size: 1.2rem;
-    margin: 2px 0;
-}
-
-.rd-vote-controls .rd-upvote:hover, .rd-vote-controls .rd-upvote.active {
-    color: #ff4500;
-}
-
-.rd-vote-controls .rd-downvote:hover, .rd-vote-controls .rd-downvote.active {
-    color: #7193ff;
-}
-
-.rd-vote-count {
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin: 4px 0;
-    color: #d7dadc;
-}
 
 .rd-comment-body {
     flex: 1;
@@ -967,27 +940,6 @@ body.view-page {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.rd-vote-column {
-    width: 40px;
-    background-color: #f8f8f8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px 0;
-}
-
-.rd-vote-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #878a8c;
-    font-size: 1.2rem;
-}
-
-.rd-vote-score {
-    font-weight: bold;
-    margin: 5px 0;
-}
 
 .rd-post-content {
     flex: 1;
@@ -1108,4 +1060,101 @@ body.view-page {
     .rd-post-media {
         max-width: 100%;
     }
+}
+
+.rd-discussion-media img,
+.rd-discussion-content img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+
+
+/* Voting controls styling */
+.rd-vote-controls {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    font-size: 16px; /* Smaller font size for icons */
+}
+
+.rd-upvote, .rd-downvote {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 6px;
+    color: #878A8C;
+    font-size: 16px; /* Smaller font size */
+    display: flex;
+    align-items: center;
+}
+
+.rd-upvote:hover {
+    color: #FF8b60;
+}
+
+.rd-downvote:hover {
+    color: #9494FF;
+}
+
+.rd-upvote.active {
+    color: #FF8b60;
+}
+
+.rd-downvote.active {
+    color: #9494FF;
+}
+
+.rd-vote-count {
+    font-weight: bold;
+    margin: 0 4px;
+    font-size: 14px;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* For discussion vote controls */
+.rd-discussion-footer {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.rd-discussion-actions {
+    display: flex;
+    align-items: center;
+}
+
+.rd-discussion-actions a {
+    margin-right: 15px;
+    color: #878A8C;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.rd-discussion-actions a i {
+    margin-right: 5px;
+}
+
+.rd-discussion-actions {
+    margin-top: 10px;
+}
+
+.rd-delete-btn {
+    color: #ff6b6b;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: rgba(255, 107, 107, 0.1);
+    transition: all 0.2s ease;
+}
+
+.rd-delete-btn:hover {
+    background-color: rgba(255, 107, 107, 0.2);
+    color: #ff4f4f;
 }

@@ -15,3 +15,8 @@ form {
 h2 {
   margin-bottom: auto;
 }
+
+footer {
+  position: relative;
+  margin-top: 20px;
+}
