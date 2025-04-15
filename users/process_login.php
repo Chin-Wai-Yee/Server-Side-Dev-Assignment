@@ -38,7 +38,15 @@ try {
         
         // Regenerate session ID for security
         session_regenerate_id(true);
-        header('Location: ../index.php');
+
+        // Redirect based on user role
+        if ($_SESSION['role'] === 'admin') {
+            // Redirect to admin dashboard
+            header('Location: ../users/admin_dashboard.php');
+        } else {
+            // Redirect to user index page
+            header('Location: ../index.php');
+        }
         exit;
     } else {
         $_SESSION['error'] = 'Invalid email or password';
@@ -50,4 +58,3 @@ try {
     header('Location: login.php');
     exit;
 }
-?>
