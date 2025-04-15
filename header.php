@@ -18,7 +18,7 @@
                     <a href="<?= $base_path ?>/recipes/recipe.php#search-bar">Search Recipe</a>
                 </div>
             </div>
-            <li> <a href="<?= $base_path ?>/meal_planning.php">Meal Planning</a> </li>
+            <li> <a href="<?= $base_path ?>/meal_planner/meal_planner_page.php">Meal Planning</a> </li>
             <li> <a href="<?= $base_path ?>/community/discussions/list.php">Community</a> </li>
 
             <div class="dropdown">
