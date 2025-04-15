@@ -24,3 +24,16 @@ footer {
   position: relative;
   margin-top: 20px;
 }
+
+body {
+  background-image: url('../Image/background.png'); /* Path to your background image */
+  background-size: cover;  /* Cover the entire viewport */
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;  /* Ensure the body covers the full height of the viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0;
+  color: white; /* Optional: Set text color for better readability */
+}
