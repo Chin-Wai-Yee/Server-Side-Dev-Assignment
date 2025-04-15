@@ -77,7 +77,7 @@ include __DIR__ . '/../../header.php';
 ?>
 
 <link rel="stylesheet" href="/recipe%20culinary/styles.css">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <body class="community-page">
     <div class="community-header">
         <div class="container">
