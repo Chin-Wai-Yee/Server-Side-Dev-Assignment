@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 15, 2025 at 05:14 PM
+-- Generation Time: Apr 15, 2025 at 10:03 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,8 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `recipe_culinary`
 --
-CREATE DATABASE IF NOT EXISTS `recipe_culinary` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `recipe_culinary`;
 
 -- --------------------------------------------------------
 
@@ -46,7 +44,8 @@ CREATE TABLE `comments` (
 INSERT INTO `comments` (`comment_id`, `user_id`, `discussion_id`, `parent_comment_id`, `content`, `created_at`, `updated_at`) VALUES
 (37, 12, 9, NULL, 'WOOOOWWWW', '2025-04-15 04:29:13', '2025-04-15 04:29:13'),
 (38, 13, 9, NULL, 'what kind of chocolate did you get?', '2025-04-15 04:31:35', '2025-04-15 04:31:35'),
-(39, 13, 7, NULL, 'nice!', '2025-04-15 05:15:54', '2025-04-15 05:15:54');
+(39, 13, 7, NULL, 'nice!', '2025-04-15 05:15:54', '2025-04-15 05:15:54'),
+(40, 12, 16, NULL, 'NICE', '2025-04-16 03:57:51', '2025-04-16 03:57:51');
 
 -- --------------------------------------------------------
 
@@ -70,7 +69,9 @@ INSERT INTO `comments_vote` (`vote_id`, `user_id`, `comment_id`, `vote_value`, `
 (14, 12, 35, 1, '2025-04-15 03:53:27'),
 (15, 12, 37, 1, '2025-04-15 04:29:17'),
 (16, 13, 37, 1, '2025-04-15 04:30:30'),
-(17, 13, 38, 1, '2025-04-15 04:31:39');
+(17, 13, 38, 1, '2025-04-15 04:31:39'),
+(18, 12, 40, 1, '2025-04-16 03:57:53'),
+(19, 12, 39, 1, '2025-04-16 04:00:19');
 
 -- --------------------------------------------------------
 
@@ -151,7 +152,8 @@ INSERT INTO `discussions` (`discussion_id`, `user_id`, `recipe_id`, `title`, `co
 (7, 12, 2, 'BEST AGLIO OLIO EVER', 'I made this aglio olio today and it was FIRE 10/10', 'uploads/discussion_media/67fd540d4f1c5_IMG_9714.jpg', '2025-04-15 02:29:33', '2025-04-15 02:29:33'),
 (8, 12, 30, 'Question about the chinese fried rice', 'Anyone made the chinese fried rice here before? How did it taste?', NULL, '2025-04-15 02:30:50', '2025-04-15 02:30:50'),
 (9, 12, 28, 'Chocolate cookies tasted amazing.', 'Made the chocolate cookies using the recipe from this website. Tasted like heaven. Open comments for question regarding the recipe', NULL, '2025-04-15 02:32:35', '2025-04-15 02:32:35'),
-(15, 13, 31, 'Chicken Tikka Masala taste....', 'I mean it taste ok, just not the best...could be better', NULL, '2025-04-15 05:17:05', '2025-04-15 05:17:05');
+(15, 13, 31, 'Chicken Tikka Masala taste....', 'I mean it taste ok, just not the best...could be better', NULL, '2025-04-15 05:17:05', '2025-04-15 05:17:05'),
+(16, 12, 32, 'Modified nasi goreng kampung', 'changes the ingredient to my likings. Taste amazing', 'uploads/discussion_media/67fe9f2711593_4102929-sd_426_240_30fps.mp4', '2025-04-16 02:02:15', '2025-04-16 02:02:15');
 
 -- --------------------------------------------------------
 
@@ -174,10 +176,12 @@ CREATE TABLE `discussions_vote` (
 INSERT INTO `discussions_vote` (`vote_id`, `user_id`, `discussion_id`, `vote_value`, `created_at`) VALUES
 (10, 12, 5, 1, '2025-04-14 09:33:49'),
 (11, 12, 6, 1, '2025-04-14 10:12:52'),
-(17, 12, 7, -1, '2025-04-14 12:02:15'),
-(18, 12, 9, 1, '2025-04-14 12:28:44'),
+(17, 12, 7, 1, '2025-04-14 12:02:15'),
 (21, 13, 9, 1, '2025-04-14 12:31:43'),
-(22, 13, 15, 1, '2025-04-14 13:17:12');
+(22, 13, 15, 1, '2025-04-14 13:17:12'),
+(28, 12, 16, 1, '2025-04-15 19:18:48'),
+(36, 12, 8, -1, '2025-04-15 19:19:58'),
+(40, 12, 15, 1, '2025-04-15 20:00:07');
 
 -- --------------------------------------------------------
 
@@ -224,7 +228,16 @@ INSERT INTO `meal_plans` (`plan_id`, `user_id`, `start_date`, `end_date`, `creat
 (8, 7, '2025-03-30', '2025-04-05', '2025-04-13 17:01:31'),
 (9, 7, '2025-03-23', '2025-03-29', '2025-04-13 17:01:31'),
 (10, 7, '2025-03-16', '2025-03-22', '2025-04-13 17:01:32'),
-(11, 1, '2025-04-13', '2025-04-19', '2025-04-13 17:18:37');
+(11, 1, '2025-04-13', '2025-04-19', '2025-04-13 17:18:37'),
+(12, 12, '2025-04-15', '2025-04-21', '2025-04-15 18:54:45'),
+(13, 12, '2025-04-08', '2025-04-14', '2025-04-15 18:54:52'),
+(14, 12, '2025-04-22', '2025-04-28', '2025-04-15 18:54:53'),
+(15, 12, '2025-04-29', '2025-05-05', '2025-04-15 18:54:53'),
+(16, 12, '2025-04-01', '2025-04-07', '2025-04-15 18:54:54'),
+(17, 12, '2025-03-25', '2025-03-31', '2025-04-15 18:54:54'),
+(18, 12, '2025-03-18', '2025-03-24', '2025-04-15 18:54:54'),
+(19, 12, '2025-03-11', '2025-03-17', '2025-04-15 18:54:54'),
+(20, 12, '2025-03-04', '2025-03-10', '2025-04-15 18:54:54');
 
 -- --------------------------------------------------------
 
@@ -427,13 +440,13 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `comments_vote`
 --
 ALTER TABLE `comments_vote`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `competitions`
@@ -451,13 +464,13 @@ ALTER TABLE `competition_recipes`
 -- AUTO_INCREMENT for table `discussions`
 --
 ALTER TABLE `discussions`
-  MODIFY `discussion_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `discussion_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `discussions_vote`
 --
 ALTER TABLE `discussions_vote`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `meal_entries`
@@ -469,7 +482,7 @@ ALTER TABLE `meal_entries`
 -- AUTO_INCREMENT for table `meal_plans`
 --
 ALTER TABLE `meal_plans`
-  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `recipes`

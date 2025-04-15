@@ -1,21 +1,44 @@
 <?php
 require_once __DIR__ . '/../../database.php';
 
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+$recipeId = isset($_GET['recipe_id']) ? (int)$_GET['recipe_id'] : null;
+
 try {
-    // Modified SQL query without votes table reference
     $sql = "
-    SELECT d.*, u.username, u.profile_image, r.title AS recipe_title, 
-       COUNT(DISTINCT c.comment_id) AS comment_count,
-       d.media_path, d.user_id  -- Add user_id here
+    SELECT d.discussion_id, d.title, d.content, d.media_path, d.created_at, d.user_id,
+           u.username, u.profile_image, 
+           r.title AS recipe_title, 
+           COUNT(DISTINCT c.comment_id) AS comment_count,
+           (SELECT COALESCE(SUM(vote_value), 0) FROM discussions_vote dv WHERE dv.discussion_id = d.discussion_id) AS votes
     FROM discussions d
     LEFT JOIN users u ON d.user_id = u.user_id
     LEFT JOIN recipes r ON d.recipe_id = r.recipe_id
     LEFT JOIN comments c ON d.discussion_id = c.discussion_id
-    GROUP BY d.discussion_id
-    ORDER BY d.created_at DESC
-";
+    WHERE (r.title LIKE ? OR d.title LIKE ?)
+    ";
 
-    $result = $conn->query($sql);
+    if ($recipeId) {
+        $sql .= " AND d.recipe_id = ?";
+    }
+
+    $sql .= " GROUP BY d.discussion_id, d.title, d.content, d.media_path, d.created_at, d.user_id, u.username, u.profile_image, r.title ORDER BY d.created_at DESC";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("SQL error: " . $conn->error);
+    }
+
+    $searchParam = '%' . $searchTerm . '%';
+
+    if ($recipeId) {
+        $stmt->bind_param('ssi', $searchParam, $searchParam, $recipeId);
+    } else {
+        $stmt->bind_param('ss', $searchParam, $searchParam);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if (!$result) {
         throw new Exception("Query failed: " . $conn->error);
@@ -67,6 +90,27 @@ function get_media_type($media_path)
     }
 }
 
+// Add a helper function to check if the user has voted
+function has_user_voted($discussion_id, $user_id, $conn) {
+    $stmt = $conn->prepare("SELECT vote_value FROM discussions_vote WHERE discussion_id = ? AND user_id = ?");
+    $stmt->bind_param("ii", $discussion_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc()['vote_value'];
+    }
+    return 0; // No vote
+}
+
+try {
+    $recipeQuery = "SELECT recipe_id, title FROM recipes ORDER BY title ASC";
+    $recipeStmt = $conn->prepare($recipeQuery);
+    $recipeStmt->execute();
+    $recipes = $recipeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+} catch (Exception $e) {
+    die("Error fetching recipes: " . $e->getMessage());
+}
+
 include __DIR__ . '/../../header.php';
 ?>
 
@@ -88,8 +132,8 @@ include __DIR__ . '/../../header.php';
 
     .rd-post-card {
         display: flex;
-        background: white;
-        border-radius: 4px;
+        background-color: rgb(248, 246, 232);
+        border-radius: 20px;
         border: 1px solid #ccc;
         overflow: hidden;
         transition: box-shadow 0.3s ease;
@@ -97,7 +141,7 @@ include __DIR__ . '/../../header.php';
     }
 
     .rd-post-card:hover {
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 10px rgba(255, 119, 0, 0.1);
     }
 
     .rd-post-link {
@@ -130,9 +174,21 @@ include __DIR__ . '/../../header.php';
         z-index: 3;
     }
 
+    .rd-vote-button.upvote.active {
+        color: #ff4500;
+        /* Orange for active upvote */
+    }
+
+    .rd-vote-button.downvote.active {
+        color: #1484D6;
+        /* Blue for active downvote */
+    }
+
     .rd-vote-score {
         font-weight: bold;
         margin: 5px 0;
+        color: #000;
+        /* Default color for the vote score */
     }
 
     .rd-post-content {
@@ -174,27 +230,27 @@ include __DIR__ . '/../../header.php';
     }
 
     .rd-post-text {
+        color: rgb(0, 0, 0);
         flex: 1;
     }
 
     .rd-post-media {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         flex: 1;
-        max-width: 50%;
+        max-width: 100%;
+        margin: 15px auto;
         border-radius: 4px;
         overflow: hidden;
         position: relative;
         z-index: 2;
     }
 
-    .rd-post-media img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-    }
-
+    .rd-post-media img,
     .rd-post-media video {
-        width: 100%;
-        max-height: 400px;
+        max-width: 100%;
+        height: auto;
         object-fit: contain;
     }
 
@@ -231,7 +287,7 @@ include __DIR__ . '/../../header.php';
         border-radius: 9999px;
         font-weight: bold;
         text-decoration: none;
-        margin-bottom: 20px;
+        margin-top: 20px;
         transition: background-color 0.2s;
     }
 
@@ -241,6 +297,7 @@ include __DIR__ . '/../../header.php';
 
     .rd-community-heading {
         margin-bottom: 20px;
+        text-align: left;
     }
 
     .rd-recipe-related {
@@ -252,15 +309,22 @@ include __DIR__ . '/../../header.php';
         display: inline-block;
     }
 
-    @media (max-width: 768px) {
-        .rd-post-body {
-            flex-direction: column;
-        }
-
-        .rd-post-media {
-            max-width: 100%;
-        }
+    .rd-search-bar {
+        margin: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
+
+    .rd-search-bar input[type="text"],
+    .rd-search-bar select {
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
 
     body {
         background: rgb(31, 31, 31);
@@ -276,14 +340,6 @@ include __DIR__ . '/../../header.php';
         /* Match footer height + extra spacing */
     }
 
-    /* Footer styling */
-    footer {
-        position: relative;
-        z-index: 100;
-        background: white;
-        margin-top: auto;
-        /* Pushes footer to bottom */
-    }
 
     /* Prevent media overflow */
     .rd-media-image,
@@ -304,6 +360,22 @@ include __DIR__ . '/../../header.php';
     <div class="rd-container">
         <div class="rd-community-heading">
             <h1>Culinary Community Discussions</h1>
+        </div>
+
+        <!-- Add a search form -->
+        <div class="rd-search-bar">
+            <form method="GET" action="">
+                <input type="text" name="search" placeholder="Search for recipes or discussions..." value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" />
+                <select name="recipe_id">
+                    <option value="">-- Select a Recipe --</option>
+                    <?php foreach ($recipes as $recipe): ?>
+                        <option value="<?= $recipe['recipe_id'] ?>" <?= (isset($_GET['recipe_id']) && $_GET['recipe_id'] == $recipe['recipe_id']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($recipe['title']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+
             <a href="<?= $base_path ?>/community/discussions/create.php" class="rd-new-post-button">
                 <i class="fas fa-plus"></i> New Discussion
             </a>
@@ -316,17 +388,18 @@ include __DIR__ . '/../../header.php';
                     $mediaType = get_media_type($discussion['media_path']);
                     $hasMedia = $mediaType !== 'none';
                     $media_url = $hasMedia ? $base_path . '/' . $discussion['media_path'] : '';
+                    $user_vote = isset($_SESSION['user_id']) ? has_user_voted($discussion['discussion_id'], $_SESSION['user_id'], $conn) : 0;
                     ?>
                     <div class="rd-post-card">
                         <!-- Main clickable area that covers the whole card -->
                         <a href="view.php?id=<?= $discussion['discussion_id'] ?>" class="rd-post-link"></a>
 
                         <div class="rd-vote-column">
-                            <button class="rd-vote-button" data-discussion-id="<?= $discussion['discussion_id'] ?>" data-vote="up">
+                            <button class="rd-vote-button upvote <?= $user_vote === 1 ? 'active' : '' ?>" data-discussion-id="<?= $discussion['discussion_id'] ?>" data-vote="1">
                                 <i class="fas fa-arrow-up"></i>
                             </button>
-                            <div class="rd-vote-score" id="score-<?= $discussion['discussion_id'] ?>">0</div>
-                            <button class="rd-vote-button" data-discussion-id="<?= $discussion['discussion_id'] ?>" data-vote="down">
+                            <div class="rd-vote-score" id="score-<?= $discussion['discussion_id'] ?>"><?= $discussion['votes'] ?? 0 ?></div>
+                            <button class="rd-vote-button downvote <?= $user_vote === -1 ? 'active' : '' ?>" data-discussion-id="<?= $discussion['discussion_id'] ?>" data-vote="-1">
                                 <i class="fas fa-arrow-down"></i>
                             </button>
                         </div>
@@ -381,9 +454,6 @@ include __DIR__ . '/../../header.php';
                                     <i class="fas fa-comment-alt"></i>
                                     <span><?= $discussion['comment_count'] ?> Comments</span>
                                 </a>
-
-
-
                             </div>
                         </div>
                     </div>
@@ -391,69 +461,64 @@ include __DIR__ . '/../../header.php';
             </div>
         <?php else: ?>
             <div class="alert alert-info">
-                No discussions found yet. Be the first to start one!
+                No discussions found matching your search. Try a different keyword!
             </div>
         <?php endif; ?>
     </div>
 </body>
 
 <script>
+    // JavaScript for handling voting
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle voting buttons
         const voteButtons = document.querySelectorAll('.rd-vote-button');
 
         voteButtons.forEach(button => {
             button.addEventListener('click', function(e) {
-                // Prevent the click from bubbling up to the card link
                 e.preventDefault();
-                e.stopPropagation();
 
                 const discussionId = this.getAttribute('data-discussion-id');
-                const voteType = this.getAttribute('data-vote');
+                const voteValue = this.getAttribute('data-vote');
+                const csrfToken = '<?= $_SESSION['csrf_token'] ?>'; // Include CSRF token
 
-                // This would be replaced with an actual AJAX call to a vote handling script
-                console.log(`Vote ${voteType} for discussion ${discussionId}`);
+                fetch('discussion_vote.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            discussion_id: discussionId,
+                            vote_value: voteValue,
+                            csrf_token: csrfToken,
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const scoreElement = document.getElementById(`score-${discussionId}`);
+                            scoreElement.textContent = data.total_votes;
 
-                // For demonstration purposes only - in production this would update based on server response
-                const scoreElement = document.getElementById(`score-${discussionId}`);
-                let currentScore = parseInt(scoreElement.textContent);
+                            // Highlight the active vote
+                            const upvoteButton = document.querySelector(`.rd-vote-button.upvote[data-discussion-id="${discussionId}"]`);
+                            const downvoteButton = document.querySelector(`.rd-vote-button.downvote[data-discussion-id="${discussionId}"]`);
 
-                if (voteType === 'up') {
-                    scoreElement.textContent = currentScore + 1;
-                } else {
-                    scoreElement.textContent = currentScore - 1;
-                }
-            });
-        });
-
-        // Handle share and bookmark buttons
-        const actionButtons = document.querySelectorAll('.share-button, .bookmark-button');
-
-        actionButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                // Prevent the click from bubbling up to the card link
-                e.preventDefault();
-                e.stopPropagation();
-
-                const discussionId = this.getAttribute('data-id');
-                const actionType = this.classList.contains('share-button') ? 'share' : 'bookmark';
-
-                console.log(`${actionType} discussion ${discussionId}`);
-
-                // Add your actual share/bookmark logic here
-            });
-        });
-
-        // Make media clicks not navigate to the post detail page
-        const mediaElements = document.querySelectorAll('.rd-post-media video, .rd-post-media img');
-
-        mediaElements.forEach(media => {
-            media.addEventListener('click', function(e) {
-                // Only prevent navigation for videos that need to be played
-                if (this.tagName.toLowerCase() === 'video') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
+                            if (data.user_vote === 1) {
+                                upvoteButton.classList.add('active');
+                                downvoteButton.classList.remove('active');
+                            } else if (data.user_vote === -1) {
+                                downvoteButton.classList.add('active');
+                                upvoteButton.classList.remove('active');
+                            } else {
+                                upvoteButton.classList.remove('active');
+                                downvoteButton.classList.remove('active');
+                            }
+                        } else {
+                            alert(data.error || 'An error occurred while voting.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while voting.');
+                    });
             });
         });
     });

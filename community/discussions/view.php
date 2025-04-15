@@ -213,7 +213,7 @@ include __DIR__ . '/../../header.php';
                     <form action="<?= $base_path ?>/community/comments/create.php" method="post">
                         <?= csrf_field() ?>
                         <input type="hidden" name="discussion_id" value="<?= $discussion_id ?>">
-                        <textarea name="content"><?= htmlspecialchars($_SESSION['form_data']['content'] ?? '') ?></textarea>
+                        <textarea name="content" placeholder="Comments"><?= htmlspecialchars($_SESSION['form_data']['content'] ?? '') ?></textarea>
                         <button type="submit">Comment</button>
                     </form>
                 </div>
