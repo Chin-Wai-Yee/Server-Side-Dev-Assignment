@@ -1,0 +1,61 @@
+/* Override bootstrap */
+
+body {
+  line-height: unset !important;
+}
+
+form {
+  display: block;
+}
+
+main {
+  padding-bottom: 5rem !important;
+}
+
+.home {
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../images/competition-bg.png');
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 30px;
+}
+
+.dropdown {
+  position: unset !important;
+}
+
+/* Recipe Card Styles */
+.floating-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: none;
+  overflow: hidden;
+}
+
+.floating-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.floating-card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.loading-spinner {
+  padding: 40px;
+}
+
+/* Float animation */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}

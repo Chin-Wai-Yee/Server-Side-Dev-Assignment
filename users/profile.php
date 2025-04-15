@@ -32,7 +32,7 @@ $user->read_single();
 <body>
     <?php include_once '../header.php'; ?>
 
-    <div class="container my-5">
+    <div class="container my-5 pb-5">
         <div class="row">
             <div class="col-md-8 mb-4">
                 <div class="card">

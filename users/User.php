@@ -13,18 +13,19 @@ class User {
     public $profile_image;
     public $bio;
     public $created_at;
-
+    public $role;
+    
     public function __construct() {
         global $conn;
         $this->conn = $conn;
     }
 
-    public function register($username, $email, $password) {
+    public function register($username, $email, $password, $role = 'user') {
         try {
             $stmt = $this->conn->prepare(
-                "INSERT INTO users (username, email, password, created_at) VALUES (?, ?, ?, NOW())"
+                "INSERT INTO users (username, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())"
             );
-            $stmt->bind_param("sss", $username, $email, $password);
+            $stmt->bind_param("ssss", $username, $email, $password, $role);
             return $stmt->execute();
         } catch (Exception $e) {
             error_log("Error creating user: " . $e->getMessage());
@@ -33,20 +34,22 @@ class User {
     }
 
     public function login() {
-        $stmt = $this->conn->prepare(
-            "SELECT user_id, username, password FROM {$this->table} WHERE email = ? LIMIT 1"
-        );
-        $stmt->bind_param("s", $this->email);
+        $query = 'SELECT user_id, username, email, password, role 
+                  FROM ' . $this->table . ' 
+                  WHERE email = ? 
+                  LIMIT 0,1';
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('s', $this->email);
         $stmt->execute();
         $result = $stmt->get_result();
     
         if ($result && $row = $result->fetch_assoc()) {
-            // Debug log
-            error_log("Login: user found for email " . $this->email);
-            
             if (password_verify($this->password, $row['password'])) {
                 $this->user_id = $row['user_id'];
                 $this->username = $row['username'];
+                $this->email = $row['email'];
+                $this->role = $row['role'];
                 return true;
             } else {
                 error_log("Login: password mismatch for email " . $this->email);
@@ -74,6 +77,7 @@ class User {
             $this->profile_image = $row['profile_image'];
             $this->bio = $row['bio'];
             $this->created_at = $row['created_at'];
+            $this->role = $row['role'];
             return true;
         }
 
