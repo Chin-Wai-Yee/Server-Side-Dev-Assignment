@@ -1,0 +1,7 @@
+.community-header {
+    background-color: #1a1a1a;  /* Your dark grey color */
+    color: #ffffff;  /* Text color */
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+}
