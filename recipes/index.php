@@ -44,7 +44,7 @@ $result = $conn->query($sql);
         <form method="GET" class="search-bar-container" onsubmit="return scrollToSearch();">
             <input type="text" name="search" style="margin-top:10px;" placeholder="Search recipe by title..." value="<?php echo htmlspecialchars($search_term); ?>">
             <button type="submit"><i class="fas fa-search"></i> Search</button>
-            <button type="button" onclick="window.location.href='recipe.php#search-bar';"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button type="button" onclick="window.location.href='../recipes/index.php#search-bar';"><i class="fas fa-sync-alt"></i> Refresh</button>
         </form>
 
         <!-- RECIPE GRID -->
