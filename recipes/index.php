@@ -1,5 +1,7 @@
 <?php
+session_start();
 require '../database.php';  // DB connection
+require '../users/require_login.php';
 
 $search_term = '';
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {

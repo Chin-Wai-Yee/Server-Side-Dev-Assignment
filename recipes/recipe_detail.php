@@ -1,10 +1,7 @@
 <?php
-require '../database.php';
-
-if (!isset($_GET['recipe_id'])) {
-    echo "Invalid recipe ID";
-    exit;
-}
+session_start();
+require '../database.php';  // DB connection
+require '../users/require_login.php';
 
 $id = intval($_GET['recipe_id']);
 $sql = "SELECT * FROM recipes WHERE recipe_id = $id";

@@ -1,5 +1,7 @@
 <?php
-require '../database.php';
+session_start();
+require '../database.php';  // DB connection
+require '../users/require_login.php';
 
 $feedback = '';
 $feedback_class = '';
