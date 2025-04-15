@@ -71,6 +71,7 @@ include __DIR__ . '/../../header.php';
 ?>
 
 <link rel="stylesheet" href="/recipe culinary/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
     .rd-container {
         max-width: 1000px;
