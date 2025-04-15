@@ -122,5 +122,33 @@ class Vote {
         $stmt->close();
         return $recipes;
     }
+    
+    // Get the winner of a competition
+    public function get_competition_winner($competition_id) {
+        $query = "SELECT cr.id as comp_recipe_id, cr.recipe_id, r.title as recipe_title, 
+                 r.image_path, u.username as name, u.user_id,
+                 COUNT(v.id) as vote_count
+                 FROM competition_recipes cr
+                 JOIN recipes r ON cr.recipe_id = r.recipe_id
+                 LEFT JOIN users u ON r.user_id = u.user_id
+                 LEFT JOIN votes v ON cr.id = v.recipe_id
+                 WHERE cr.competition_id = ?
+                 GROUP BY cr.id
+                 ORDER BY vote_count DESC
+                 LIMIT 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $competition_id);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+        
+        $stmt->close();
+        return null;
+    }
 }
 ?>

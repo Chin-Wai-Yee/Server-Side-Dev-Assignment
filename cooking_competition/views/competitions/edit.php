@@ -18,7 +18,7 @@
                         </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="index.php?page=competitions&action=edit&id=<?= $competition['id'] ?>">
+                    <form method="POST" action="index.php?page=competitions&action=edit&id=<?= $competition['id'] ?>" enctype="multipart/form-data">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="title" name="title" value="<?= htmlspecialchars($competition['title']) ?>" placeholder="Title" required>
                             <label for="title">Title</label>
@@ -27,6 +27,18 @@
                         <div class="form-floating mb-3">
                             <textarea class="form-control" id="description" name="description" rows="4" placeholder="Description" style="height: 100px;" required><?= htmlspecialchars($competition['description']) ?></textarea>
                             <label for="description">Description</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Competition Image (Optional)</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <div class="form-text">Upload an image to represent this competition. Max size: 2MB.</div>
+                            <?php if (!empty($competition['image'])): ?>
+                                <div class="mt-2">
+                                    <p>Current image:</p>
+                                    <img src="<?= htmlspecialchars($competition['image']) ?>" class="img-thumbnail" style="max-height: 150px;" alt="Current competition image">
+                                </div>
+                            <?php endif; ?>
                         </div>
                         
                         <div class="row mb-3">

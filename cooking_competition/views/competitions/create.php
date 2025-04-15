@@ -1,7 +1,7 @@
 <div class="create-competition">
     <h1>Create a New Competition</h1>
 
-    <form method="POST" class="col-md-6 mx-auto">
+    <form method="POST" class="col-md-6 mx-auto" enctype="multipart/form-data">
         <div class="form-floating mb-3">
             <input type="text" class="form-control" id="title" name="title" placeholder="Title" required>
             <label for="title">Title</label>
@@ -10,6 +10,12 @@
         <div class="form-floating mb-3">
             <textarea class="form-control" id="description" name="description" placeholder="Description" style="height: 100px" required></textarea>
             <label for="description">Description</label>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Competition Image (Optional)</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            <div class="form-text">Upload an image to represent this competition. Max size: 2MB.</div>
         </div>
 
         <div class="row mb-3">

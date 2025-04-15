@@ -1,16 +1,13 @@
 <div class="mb-5">
-    <h1 class="display-4">Welcome to Cooking Competition Platform!</h1>
-    <p class="lead">Join cooking competitions, share your recipes, and vote for your favorites.</p>
-    <?php if (!$logged_in): ?>
-        <a href="../users/login.php" class="btn btn-primary">Sign Up Now</a>
-    <?php else: ?>
-        <div class="action-buttons mt-3">
-            <a href="index.php?page=competitions&action=create" class="btn btn-success me-2">Create Competition</a>
-            <a href="index.php?page=competitions" class="btn btn-primary">All Competitions</a>
+    <div class="home hero-section d-flex align-items-center justify-content-center text-white">
+        <div class="hero-content text-center p-4">
+            <h1 class="display-4">Welcome to Cooking Competition Platform!</h1>
+            <p class="lead">Join cooking competitions, share your recipes, and vote for your favorites.</p>
+
+            <div class="mt-3">
+                <a href="../" class="btn btn-outline-light">← Back to Home</a>
+            </div>
         </div>
-    <?php endif; ?>
-    <div class="mt-3">
-        <a href="../" class="btn btn-outline-secondary">← Back to Home</a>
     </div>
 
     <?php if (isset($_SESSION['success'])): ?>
@@ -28,6 +25,10 @@
     <?php endif; ?>
 </div>
 
+<?php
+$status = $_GET['status'] ?? 'all';
+$currentPage = '';
+?>
 <?php include_once 'views/competitions/filter_buttons.php'; ?>
 
 <?php

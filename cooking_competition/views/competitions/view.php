@@ -4,17 +4,46 @@
 
 <div class="card mb-4">
     <?php if (!empty($competition['image'])): ?>
-    <img src="<?= htmlspecialchars($competition['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($competition['title']) ?>" style="max-height: 300px; object-fit: cover;">
+        <img src="<?= htmlspecialchars($competition['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($competition['title']) ?>" style="max-height: 300px; object-fit: cover;">
+    <?php else: ?>
+        <img src="assets/images/default_competition.png" class="card-img-top" alt="Default Competition Image" style="max-height: 300px; object-fit: cover;">
     <?php endif; ?>
-    
+
     <div class="card-body">
         <h1 class="card-title"><?= htmlspecialchars($competition['title']) ?></h1>
         
-        <div class="mb-3">
-            <span class="badge bg-<?= $competition['status'] == 'active' ? 'success' : ($competition['status'] == 'voting' ? 'warning' : 'secondary') ?>">
-                <?= ucfirst($competition['status']) ?>
-            </span>
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div class="col"></div>
+            <div class="text-center col">
+                <span class="badge bg-<?= $competition['status'] == 'active' ? 'success' : ($competition['status'] == 'voting' ? 'warning' : 'secondary') ?>">
+                    <?= ucfirst($competition['status']) ?>
+                </span>
+            </div>
+            <div class="col">
+                <?php if ((isset($_SESSION['role']) && $_SESSION['role'] == 'admin') || 
+                    (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $competition['created_by'])): ?>
+                <a href="index.php?page=competitions&action=edit&id=<?= $competition['id'] ?>" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="index.php?page=competitions&action=delete&id=<?= $competition['id'] ?>" 
+                class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete
+                </a>
+                <?php endif; ?>
+            </div>
         </div>
+
+        <?php
+        // Get creator information
+        $creator_query = "SELECT username FROM users WHERE user_id = ?";
+        $stmt = $this->conn->prepare($creator_query);
+        $stmt->bind_param('i', $competition['created_by']);
+        $stmt->execute();
+        $creator_result = $stmt->get_result();
+        $creator = $creator_result->fetch_assoc();
+        $stmt->close();
+        ?>
+        <p class="text-muted mb-3">Created by: <?= htmlspecialchars($creator['username']) ?></p>
         
         <p class="card-text"><?= nl2br(htmlspecialchars($competition['description'])) ?></p>
         
@@ -34,7 +63,7 @@
         <?php if ($competition['status'] == 'completed' && isset($winner)): ?>
         <div class="alert alert-success">
             <h4>Winner: <?= htmlspecialchars($winner['name']) ?></h4>
-            <p>Recipe: <a href="index.php?page=recipes&action=view&id=<?= $winner['recipe_id'] ?>"><?= htmlspecialchars($winner['recipe_title']) ?></a></p>
+            <p>Recipe: <a href="../recipes/recipe_detail.php?recipe_id=<?= $winner['recipe_id'] ?>" target="_blank"><?= htmlspecialchars($winner['recipe_title']) ?></a></p>
         </div>    
         <?php elseif ($competition['status'] == 'upcoming'): ?>
         <div class="mt-3">
@@ -99,9 +128,9 @@ if ($logged_in && $competition['status'] == 'voting') {
 <div class="row">
     <?php foreach ($recipes as $recipe): ?>
     <div class="col-md-4 mb-4">
-        <div class="card floating-card" data-recipe-id="<?= $recipe['comp_recipe_id'] ?>" data-bs-toggle="modal" data-bs-target="#recipeModal<?=$recipe['comp_recipe_id']?>">
-            <?php if (!empty($recipe['image'])): ?>
-            <img src="<?= htmlspecialchars($recipe['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($recipe['title']) ?>">
+        <div class="card recipe-card floating-card" data-recipe-id="<?= $recipe['comp_recipe_id'] ?>" data-bs-target="#recipeModal<?=$recipe['comp_recipe_id']?>">
+            <?php if (!empty($recipe['image_path'])): ?>
+            <img src="../recipes/<?= htmlspecialchars($recipe['image_path']) ?>" class="card-img-top" alt="<?= htmlspecialchars($recipe['title']) ?>">
             <?php endif; ?>
             <div class="card-body">
                 <h5 class="card-title"><?= htmlspecialchars($recipe['title']) ?></h5>
@@ -137,9 +166,9 @@ if ($logged_in && $competition['status'] == 'voting') {
         </div>
       </div>
       
-      <?php endforeach; ?>
       <!-- Modal for recipe popup -->
       <?php include 'views/competitions/recipe_modal.php'; ?>
+      <?php endforeach; ?>
 </div>
 <?php else: ?>
 <div class="alert alert-info">No recipes have been submitted yet.</div>
@@ -147,11 +176,36 @@ if ($logged_in && $competition['status'] == 'voting') {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // More effectively prevent modal from opening when clicking buttons inside recipe cards
+    const cardButtons = document.querySelectorAll('.recipe-card .btn, .recipe-card button, .recipe-card a');
+
+    // Remove the click handler from the parent recipe card's data-bs-toggle attribute
+    document.querySelectorAll('.recipe-card').forEach(card => {
+      // Instead of relying on data-bs-toggle, we'll manually control modal opening
+      const modalId = card.getAttribute('data-bs-target');
+      
+      // Remove the automatic trigger
+      card.removeAttribute('data-bs-toggle');
+      
+      // Add our custom click handler
+      card.addEventListener('click', function(e) {
+        // Only open the modal if the click was directly on the card
+        // (not on a button/link inside the card)
+        if (e.target === this || this.contains(e.target) && 
+            !e.target.closest('.btn') && 
+            !e.target.closest('button') && 
+            !e.target.closest('a')) {
+          const modal = new bootstrap.Modal(document.querySelector(modalId));
+          modal.show();
+        }
+      });
+    });
+    
     // Setup event listeners for all like buttons
     const likeButtons = document.querySelectorAll('.like-btn');
     
     likeButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(event) {
             if (!this.disabled) {
                 const recipeId = this.getAttribute('data-recipe-id');
                 const competitionId = this.getAttribute('data-competition-id');

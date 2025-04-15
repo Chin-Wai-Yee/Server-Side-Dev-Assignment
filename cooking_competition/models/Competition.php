@@ -25,8 +25,8 @@ class Competition {
     // Create competition
     public function create() {
         // Clean data
-        $this->title = htmlspecialchars(strip_tags($this->title));
-        $this->description = htmlspecialchars(strip_tags($this->description));
+        $this->title = strip_tags($this->title);
+        $this->description = strip_tags($this->description);
         $this->image = htmlspecialchars(strip_tags($this->image)); // Clean image
         $this->start_date = htmlspecialchars(strip_tags($this->start_date));
         $this->end_date = htmlspecialchars(strip_tags($this->end_date));
@@ -87,11 +87,13 @@ class Competition {
             $this->id = $row['id'];
             $this->title = $row['title'];
             $this->description = $row['description'];
+            $this->image = $row['image'];
             $this->start_date = $row['start_date'];
             $this->end_date = $row['end_date'];
             $this->voting_end_date = $row['voting_end_date'];
             $this->status = $row['status'];
             $this->created_at = $row['created_at'];
+            $this->created_by = $row['created_by'];
             
             $stmt->close();
             return true;
@@ -109,6 +111,7 @@ class Competition {
                 'id' => $this->id,
                 'title' => $this->title,
                 'description' => $this->description,
+                'image' => $this->image,
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date,
                 'voting_end_date' => $this->voting_end_date,
@@ -161,14 +164,15 @@ class Competition {
     }
     
     // Update competition
-    public function update($id, $title, $description, $start_date, $end_date, $voting_end_date, $status) {
+    public function update($id, $title, $description, $start_date, $end_date, $voting_end_date, $status, $image = '') {
         // Clean data
-        $title = htmlspecialchars(strip_tags($title));
-        $description = htmlspecialchars(strip_tags($description));
+        $title = strip_tags($title);
+        $description = strip_tags($description);
         $start_date = htmlspecialchars(strip_tags($start_date));
         $end_date = htmlspecialchars(strip_tags($end_date));
         $voting_end_date = htmlspecialchars(strip_tags($voting_end_date));
         $status = htmlspecialchars(strip_tags($status));
+        $image = htmlspecialchars(strip_tags($image));
         $id = htmlspecialchars(strip_tags($id));
         
         // Prepare query
@@ -178,19 +182,21 @@ class Competition {
                       start_date = ?,
                       end_date = ?,
                       voting_end_date = ?,
-                      status = ?
+                      status = ?,
+                      image = ?
                   WHERE id = ?";
         
         $stmt = $this->conn->prepare($query);
         
         // Bind parameters
-        $stmt->bind_param("ssssssi", 
+        $stmt->bind_param("sssssssi", 
             $title, 
             $description, 
             $start_date, 
             $end_date, 
             $voting_end_date, 
             $status,
+            $image,
             $id
         );
         
@@ -229,7 +235,7 @@ class Competition {
                       WHEN ? < start_date THEN 'upcoming'
                       WHEN ? >= start_date AND ? <= end_date THEN 'active'
                       WHEN ? > end_date AND ? <= voting_end_date THEN 'voting'
-                      ELSE 'closed'
+                      ELSE 'completed'
                   END";
         
         $stmt = $this->conn->prepare($query);
@@ -307,32 +313,21 @@ class Competition {
     
     // Get completed competitions with limit
     public function get_completed($limit = null) {
-        $query = "SELECT c.*, 
-                  (SELECT COUNT(*) FROM competition_recipes WHERE competition_id = c.id) as recipe_count,
-                  (SELECT r.title FROM competition_recipes cr 
-                   JOIN recipes r ON cr.recipe_id = r.recipe_id
-                   JOIN votes v ON cr.id = v.recipe_id
-                   WHERE cr.competition_id = c.id
-                   GROUP BY cr.id
-                   ORDER BY COUNT(v.id) DESC
-                   LIMIT 1) as winner_recipe_title,
-                  (SELECT u.username FROM competition_recipes cr 
-                   JOIN recipes r ON cr.recipe_id = r.recipe_id
+
+        $query = "SELECT c.*,
+                  (SELECT COUNT(*) FROM {$this->comp_recipe_table} WHERE competition_id = c.id) as recipe_count,
+                  (SELECT u.username 
+                   FROM {$this->comp_recipe_table} cr
+                   JOIN {$this->recipe_table} r ON cr.recipe_id = r.recipe_id
                    JOIN users u ON r.user_id = u.user_id
-                   JOIN votes v ON cr.id = v.recipe_id
+                   LEFT JOIN {$this->vote_table} v ON cr.id = v.recipe_id
                    WHERE cr.competition_id = c.id
                    GROUP BY cr.id
                    ORDER BY COUNT(v.id) DESC
-                   LIMIT 1) as winner_name,
-                  (SELECT cr.recipe_id FROM competition_recipes cr 
-                   JOIN votes v ON cr.id = v.recipe_id
-                   WHERE cr.competition_id = c.id
-                   GROUP BY cr.id
-                   ORDER BY COUNT(v.id) DESC
-                   LIMIT 1) as winner_recipe_id
+                   LIMIT 1) as winner_name
                   FROM {$this->table} c 
-                  WHERE c.status = 'closed' 
-                  ORDER BY c.voting_end_date DESC";
+                  WHERE c.status = 'completed'
+                  ORDER BY c.end_date DESC";
         
         if ($limit) {
             $query .= " LIMIT ?";
@@ -340,6 +335,48 @@ class Competition {
             $stmt->bind_param('i', $limit);
         } else {
             $stmt = $this->conn->prepare($query);
+        }
+        
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $competitions = [];
+        while ($row = $result->fetch_assoc()) {
+            $competitions[] = $row;
+        }
+        
+        $stmt->close();
+        return $competitions;
+    }
+    
+    // Search competitions by title or description
+    public function search($search_term, $status = 'all') {
+        $search_term = '%' . $search_term . '%';
+        
+        if ($status == 'all') {
+            $query = "SELECT c.*, 
+                    (SELECT COUNT(*) FROM competition_recipes WHERE competition_id = c.id) as recipe_count
+                    FROM {$this->table} c 
+                    WHERE (c.title LIKE ? OR c.description LIKE ?)
+                    ORDER BY 
+                    CASE 
+                        WHEN c.status = 'active' THEN 1 
+                        WHEN c.status = 'voting' THEN 2 
+                        ELSE 3 
+                    END, 
+                    c.created_at ASC";
+                    
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param('ss', $search_term, $search_term);
+        } else {
+            $query = "SELECT c.*, 
+                    (SELECT COUNT(*) FROM competition_recipes WHERE competition_id = c.id) as recipe_count
+                    FROM {$this->table} c 
+                    WHERE (c.title LIKE ? OR c.description LIKE ?) AND c.status = ?
+                    ORDER BY c.end_date ASC";
+                    
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param('sss', $search_term, $search_term, $status);
         }
         
         $stmt->execute();

@@ -31,6 +31,9 @@ class CompetitionController {
             case 'vote':
                 $this->handle_vote();
                 break;
+            case 'search':
+                $this->search_competitions();
+                break;
             default:
                 $this->list_competitions();
                 break;
@@ -38,8 +41,7 @@ class CompetitionController {
     }
 
     private function list_competitions() {
-        $status = isset($_GET['status']) ? $_GET['status'] : null;
-        $view_mode = isset($_GET['view']) ? $_GET['view'] : 'grid'; // Default to list view
+        $status = $_GET['status'] ?? 'all';
         
         $this->competition->update_status();
         if ($status) {
@@ -74,7 +76,48 @@ class CompetitionController {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->competition->title = $_POST['title'] ?? '';
             $this->competition->description = $_POST['description'] ?? '';
-            $this->competition->image = $_POST['image'] ?? '';
+            
+            // Handle image upload
+            $image_path = '';
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                // Check if the upload directory exists, create if not
+                $upload_dir = 'database/competition_images/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                // Process the uploaded file
+                $file_name = $_FILES['image']['name'];
+                $file_tmp = $_FILES['image']['tmp_name'];
+                $file_size = $_FILES['image']['size'];
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                
+                // File validation
+                $extensions = array("jpeg", "jpg", "png", "gif", "webp");
+                
+                if (in_array($file_ext, $extensions) && $file_size < 2097152) { // 2MB max
+                    $new_file_name = uniqid('comp_') . '.' . $file_ext;
+                    $upload_path = $upload_dir . $new_file_name;
+                    
+                    if (move_uploaded_file($file_tmp, $upload_path)) {
+                        $image_path = $upload_path;
+                    } else {
+                        $_SESSION['error'] = "Error uploading image";
+                        include 'views/competitions/create.php';
+                        return;
+                    }
+                } else {
+                    if (!in_array($file_ext, $extensions)) {
+                        $_SESSION['error'] = "Invalid file extension. Allowed types: jpeg, jpg, png, gif, webp";
+                    } else {
+                        $_SESSION['error'] = "File size exceeds 2MB limit";
+                    }
+                    include 'views/competitions/create.php';
+                    return;
+                }
+            }
+            
+            $this->competition->image = $image_path;
             
             // Combine date and time inputs
             $start_date = $_POST['start_date'] ?? '';
@@ -139,6 +182,14 @@ class CompetitionController {
         $recipe = new Recipe($this->conn);
         $user_recipes = $recipe->get_by_user($_SESSION['user_id']);
         
+        // Get winner information if competition is completed
+        $winner = null;
+        if ($competition['status'] == 'completed') {
+            // Get the recipe with the most votes
+            $vote = new Vote($this->conn);
+            $winner = $vote->get_competition_winner($competition['id']);
+        }
+        
         // Get the global logged_in variable
         global $logged_in;
 
@@ -170,6 +221,52 @@ class CompetitionController {
             $title = $_POST['title'] ?? '';
             $description = $_POST['description'] ?? '';
             
+            // Handle image upload
+            $image_path = $competition['image']; // Keep existing image by default
+            error_log("Existing image path: " . $image_path); // Debugging line
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+                error_log("Image upload detected"); // Debugging line
+                // Check if the upload directory exists, create if not
+                $upload_dir = 'database/competition_images/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                // Process the uploaded file
+                $file_name = $_FILES['image']['name'];
+                $file_tmp = $_FILES['image']['tmp_name'];
+                $file_size = $_FILES['image']['size'];
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                
+                // File validation
+                $extensions = array("jpeg", "jpg", "png", "gif", "webp");
+                
+                if (in_array($file_ext, $extensions) && $file_size < 2097152) { // 2MB max
+                    $new_file_name = uniqid('comp_') . '.' . $file_ext;
+                    $upload_path = $upload_dir . $new_file_name;
+                    
+                    if (move_uploaded_file($file_tmp, $upload_path)) {
+                        // If there's an existing image, remove it 
+                        if (!empty($competition['image']) && file_exists($competition['image'])) {
+                            unlink($competition['image']);
+                        }
+                        $image_path = $upload_path;
+                    } else {
+                        $_SESSION['error'] = "Error uploading image";
+                        include 'views/competitions/edit.php';
+                        return;
+                    }
+                } else {
+                    if (!in_array($file_ext, $extensions)) {
+                        $_SESSION['error'] = "Invalid file extension. Allowed types: jpeg, jpg, png, gif, webp";
+                    } else {
+                        $_SESSION['error'] = "File size exceeds 2MB limit";
+                    }
+                    include 'views/competitions/edit.php';
+                    return;
+                }
+            }
+            
             // Combine date and time inputs
             $start_date = $_POST['start_date'] ?? '';
             $start_time = $_POST['start_time'] ?? '00:00';
@@ -183,7 +280,7 @@ class CompetitionController {
             $voting_end_time = $_POST['voting_end_time'] ?? '23:59';
             $voting_end_date_time = $voting_end_date . ' ' . $voting_end_time;
             
-            $status = $_POST['status'] ?? '';
+            $status = $_POST['status'] ?? $competition['status']; // Use existing status if not provided
 
             // Validate dates: start_date < end_date < voting_end_date
             $start_timestamp = strtotime($start_date_time);
@@ -202,7 +299,9 @@ class CompetitionController {
                 return;
             }
 
-            if ($this->competition->update($_GET['id'], $title, $description, $start_date_time, $end_date_time, $voting_end_date_time, $status)) {
+            error_log("Image path: " . $image_path); // Debugging line
+
+            if ($this->competition->update($_GET['id'], $title, $description, $start_date_time, $end_date_time, $voting_end_date_time, $status, $image_path)) {
                 $_SESSION['success'] = "Competition updated successfully";
                 header('Location: index.php?page=competitions');
                 return;
@@ -348,6 +447,26 @@ class CompetitionController {
         
         header('Location: index.php?page=competitions&action=view&id=' . $competition_id);
         exit;
+    }
+    
+    private function search_competitions() {
+        $search_term = $_GET['search'] ?? '';
+        $status = $_GET['status'] ?? 'all';
+        
+        $this->competition->update_status();
+        
+        if (empty($search_term)) {
+            // If no search term, redirect back to the listing
+            header('Location: index.php?page=competitions');
+            exit;
+        }
+        
+        $competitions = $this->competition->search($search_term, $status);
+        
+        // Make logged_in status available to the view
+        global $logged_in;
+        
+        include 'views/competitions/index.php';
     }
 }
 ?>

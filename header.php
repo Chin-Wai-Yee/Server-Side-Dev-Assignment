@@ -19,7 +19,14 @@
             </div>
             <li> <a href="<?= $base_path ?>/meal_planning.php">Meal Planning</a> </li>
             <li> <a href="<?= $base_path ?>/community/discussions/list.php">Community</a> </li>
-            <li> <a href="<?= $base_path ?>/cooking_competition">Cooking Competition</a> </li>
+
+            <div class="dropdown">
+                <li> <a href="<?= $base_path ?>/cooking_competition">Cooking Competition</a> </li>
+                <div class="dropdown-content">
+                    <a href="<?= $base_path ?>/cooking_competition?page=competitions&action=create">Create Competition</a>
+                    <a href="<?= $base_path ?>/cooking_competition?page=competitions">List All Competitions</a>
+                </div>
+            </div>
 
             <!-- Check if the user is logged in -->
             <div class="dropdown">

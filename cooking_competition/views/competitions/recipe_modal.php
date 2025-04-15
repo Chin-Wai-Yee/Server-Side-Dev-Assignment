@@ -14,25 +14,25 @@
         </div>
         <div class="recipe-details-container" style="display: none;">
           <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="row">
               <div class="recipe-image-container text-center">
                 <img src="" alt="Recipe Image" class="recipe-image img-fluid rounded" style="max-height: 250px;">
               </div>
             </div>
-            <div class="col-md-6 mb-3 text-start"> <!-- Added text-start class -->
+            <div class="row text-center">
               <h4 class="recipe-title"></h4>
               <p class="recipe-author">By: <span class="author-name"></span></p>
               <p class="recipe-cuisine">Cuisine: <span class="cuisine-type"></span></p>
             </div>
           </div>
           <div class="row mt-3">
-            <div class="col-md-6 text-start"> <!-- Added text-start class -->
+            <div class="col-md-6 text-start">
               <h5>Ingredients</h5>
-              <ul class="ingredients-list text-start"></ul> <!-- Added text-start class -->
+              <ul class="ingredients-list text-start"></ul>
             </div>
-            <div class="col-md-6 text-start"> <!-- Added text-start class -->
+            <div class="col-md-6 text-start">
               <h5>Instructions</h5>
-              <div class="instructions-text text-start"></div> <!-- Added text-start class -->
+              <div class="instructions-text text-start"></div>
             </div>
           </div>
         </div>

@@ -38,7 +38,8 @@
                     <td>
                         <a href="index.php?page=competitions&action=view&id=<?= $comp['id'] ?>" class="btn btn-sm btn-info">View</a>
                         
-                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
+                        <?php if ((isset($_SESSION['role']) && $_SESSION['role'] == 'admin') || 
+                                  (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $comp['created_by'])): ?>
                             <a href="index.php?page=competitions&action=edit&id=<?= $comp['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
                             <a href="index.php?page=competitions&action=delete&id=<?= $comp['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
                         <?php endif; ?>
