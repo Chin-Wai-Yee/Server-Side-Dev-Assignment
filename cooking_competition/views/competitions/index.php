@@ -14,6 +14,10 @@
             <?php unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
+
+    <div class="mb-3">
+        <a href="index.php" class="btn btn-outline-secondary">← Back to Home</a>
+    </div>
     
     <?php if (isset($_SESSION['user_id']) && $_SESSION['role'] == 'admin'): ?>
         <div class="mb-3">

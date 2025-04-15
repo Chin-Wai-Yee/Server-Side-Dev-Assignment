@@ -16,10 +16,11 @@ class Recipe {
     public function __construct($db) {
         $this->conn = $db;
     }
-    
+
     // Submit recipe to competition
     public function submit_to_competition($competition_id, $recipe_id) {
         // Clean data
+        error_log("Submitting recipe to competition: $competition_id, $recipe_id");
         $competition_id = htmlspecialchars(strip_tags($competition_id));
         $recipe_id = htmlspecialchars(strip_tags($recipe_id));
         
@@ -32,32 +33,6 @@ class Recipe {
         $result = $stmt->execute();
         $stmt->close();
         return $result;
-    }
-    
-    // Get recipes by competition
-    public function get_by_competition($competition_id) {
-        $query = "SELECT r.*, cr.id as comp_recipe_id, u.username, 
-                 (SELECT COUNT(*) FROM votes v WHERE v.recipe_id = cr.id) as vote_count
-                 FROM {$this->comp_recipe_table} cr
-                 JOIN {$this->table} r ON cr.recipe_id = r.recipe_id
-                 LEFT JOIN users u ON r.user_id = u.user_id
-                 WHERE cr.competition_id = ?
-                 GROUP BY cr.id
-                 ORDER BY vote_count DESC";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $competition_id);
-        $stmt->execute();
-        
-        $result = $stmt->get_result();
-        
-        $recipes = [];
-        while ($row = $result->fetch_assoc()) {
-            $recipes[] = $row;
-        }
-        
-        $stmt->close();
-        return $recipes;
     }
     
     // Get single recipe
@@ -77,44 +52,6 @@ class Recipe {
         
         $stmt->close();
         return $recipe;
-    }
-    
-    // Get recipe from competition
-    public function get_competition_recipe($competition_id, $recipe_id) {
-        $query = "SELECT r.*, cr.id as comp_recipe_id, u.username,
-                 (SELECT COUNT(*) FROM votes v WHERE v.recipe_id = cr.id) as vote_count
-                 FROM {$this->comp_recipe_table} cr
-                 JOIN {$this->table} r ON cr.recipe_id = r.recipe_id
-                 LEFT JOIN users u ON r.user_id = u.user_id
-                 WHERE cr.competition_id = ? AND r.recipe_id = ?
-                 LIMIT 0,1";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ii", $competition_id, $recipe_id);
-        $stmt->execute();
-        
-        $result = $stmt->get_result();
-        $recipe = $result->fetch_assoc();
-        
-        $stmt->close();
-        return $recipe;
-    }
-    
-    // Get all recipes
-    public function get_all() {
-        $query = "SELECT r.*, u.username 
-                 FROM {$this->table} r
-                 LEFT JOIN users u ON r.user_id = u.user_id
-                 ORDER BY r.recipe_id DESC";
-        
-        $result = $this->conn->query($query);
-        
-        $recipes = [];
-        while ($row = $result->fetch_assoc()) {
-            $recipes[] = $row;
-        }
-        
-        return $recipes;
     }
 
     // Get all recipes submitted by a specific user
@@ -169,6 +106,53 @@ class Recipe {
         
         $stmt->close();
         return $exists;
+    }
+
+    /**
+     * Withdraws a user's recipe from a competition
+     * 
+     * @param int $competition_id The competition ID
+     * @param int $user_id The user ID
+     * @return bool True if successful, false otherwise
+     */
+    public function withdraw_from_competition($competition_id, $user_id) {
+        try {
+            $query = "DELETE FROM competition_recipes 
+                      WHERE competition_id = ? 
+                      AND recipe_id IN (SELECT recipe_id FROM recipes WHERE user_id = ?)";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("ii", $competition_id, $user_id);
+            
+            return $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Error withdrawing recipe: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function get_competition_recipe_details($comp_recipe_id) {
+        try {
+            $query = "SELECT r.*, u.username, cr.id as comp_recipe_id 
+                     FROM {$this->comp_recipe_table} cr
+                     JOIN {$this->table} r ON cr.recipe_id = r.recipe_id
+                     LEFT JOIN users u ON r.user_id = u.user_id
+                     WHERE cr.id = ?
+                     LIMIT 1";
+            
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("i", $comp_recipe_id);
+            $stmt->execute();
+            
+            $result = $stmt->get_result();
+            $recipe = $result->fetch_assoc();
+            
+            $stmt->close();
+            return $recipe;
+        } catch (Exception $e) {
+            error_log("Error fetching competition recipe details: " . $e->getMessage());
+            return false;
+        }
     }
 }
 ?>

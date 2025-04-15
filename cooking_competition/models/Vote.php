@@ -15,16 +15,28 @@ class Vote {
     
     // Create vote
     public function create() {
-        // Check if user already voted for this recipe
-        if($this->already_voted()) {
-            return false;
-        }
-        
         // Clean data
         $this->recipe_id = htmlspecialchars(strip_tags($this->recipe_id));
         $this->user_id = htmlspecialchars(strip_tags($this->user_id));
         
         $query = "INSERT INTO {$this->table} (recipe_id, user_id) VALUES (?, ?)";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ii", $this->recipe_id, $this->user_id);
+        
+        // Execute query
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+    
+    // Remove vote (unlike)
+    public function remove() {
+        // Clean data
+        $this->recipe_id = htmlspecialchars(strip_tags($this->recipe_id));
+        $this->user_id = htmlspecialchars(strip_tags($this->user_id));
+        
+        $query = "DELETE FROM {$this->table} WHERE recipe_id = ? AND user_id = ?";
         
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("ii", $this->recipe_id, $this->user_id);
@@ -89,7 +101,7 @@ class Vote {
         $query = "SELECT cr.recipe_id, r.title, r.image_path, u.username, COUNT(v.id) as vote_count
                   FROM competition_recipes cr
                   JOIN recipes r ON cr.recipe_id = r.recipe_id
-                  LEFT JOIN users u ON r.user_id = u.id
+                  LEFT JOIN users u ON r.user_id = u.user_id
                   LEFT JOIN votes v ON cr.id = v.recipe_id
                   WHERE cr.competition_id = ?
                   GROUP BY cr.id

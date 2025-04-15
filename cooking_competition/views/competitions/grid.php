@@ -1,7 +1,7 @@
 <div class="row">
     <?php foreach ($competitions as $comp): ?>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
+        <div class="col-md-4 mb-4" onclick="window.location.href='index.php?page=competitions&action=view&id=<?= $comp['id'] ?>'">
+            <div class="card floating-card h-100">
                 <?php if (!empty($comp['image'])): ?>
                     <img src="<?= htmlspecialchars($comp['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($comp['title']) ?>">
                 <?php else: ?>
@@ -11,7 +11,17 @@
                     <h5 class="card-title"><?= htmlspecialchars($comp['title']) ?></h5>
                     <p class="card-text"><?= htmlspecialchars(substr($comp['description'], 0, 100)) ?>...</p>
                     <div class="mb-2">
-                        <span class="badge bg-<?= $comp['status'] == 'active' ? 'success' : 'warning' ?>"><?= ucfirst($comp['status']) ?></span>
+                        <?php
+                        $badgeClass = 'warning'; // Default
+                        if ($comp['status'] == 'active') {
+                            $badgeClass = 'success';
+                        } elseif ($comp['status'] == 'upcoming') {
+                            $badgeClass = 'info';
+                        } elseif ($comp['status'] == 'completed') {
+                            $badgeClass = 'secondary';
+                        }
+                        ?>
+                        <span class="badge bg-<?= $badgeClass ?>"><?= ucfirst($comp['status']) ?></span>
                     </div>
                     <p class="card-text">
                         <small class="text-muted">
@@ -22,14 +32,6 @@
                         <?php endif; ?>
                         </small>
                     </p>
-                    <div class="d-flex justify-content-between">
-                        <a href="index.php?page=competitions&action=view&id=<?= $comp['id'] ?>" class="btn btn-primary">View Details</a>
-                        <?php if ($comp['status'] == 'active'): ?>
-                        <a href="index.php?page=recipes&action=submit&competition_id=<?= $comp['id'] ?>" class="btn btn-success">Submit Recipe</a>
-                        <?php elseif ($comp['status'] == 'voting'): ?>
-                        <a href="index.php?page=votes&action=view&competition_id=<?= $comp['id'] ?>" class="btn btn-warning">Vote Now</a>
-                        <?php endif; ?>
-                    </div>
                 </div>
                 <div class="card-footer text-muted">
                     <small><?= $comp['recipe_count'] ?> recipes submitted</small>

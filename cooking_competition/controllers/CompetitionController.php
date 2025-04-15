@@ -10,9 +10,6 @@ class CompetitionController {
 
     public function handle_request($action) {
         switch ($action) {
-            case 'index':
-                $this->list_competitions();
-                break;
             case 'create':
                 $this->create_competition();
                 break;
@@ -28,6 +25,12 @@ class CompetitionController {
             case 'submit_recipe':
                 $this->submit_recipe();
                 break;
+            case 'withdraw':
+                $this->withdraw_recipe();
+                break;
+            case 'vote':
+                $this->handle_vote();
+                break;
             default:
                 $this->list_competitions();
                 break;
@@ -35,17 +38,17 @@ class CompetitionController {
     }
 
     private function list_competitions() {
-        // This function lists all competitions
         $status = isset($_GET['status']) ? $_GET['status'] : null;
         $view_mode = isset($_GET['view']) ? $_GET['view'] : 'grid'; // Default to list view
         
+        $this->competition->update_status();
         if ($status) {
             if ($status === 'active') {
                 $competitions = $this->competition->get_by_status('active');
             } elseif ($status === 'voting') {
                 $competitions = $this->competition->get_by_status('voting');
             } elseif ($status === 'completed') {
-                $competitions = $this->competition->get_completed();
+                $competitions = $this->competition->get_by_status('completed');
             } elseif ($status === 'upcoming') {
                 $competitions = $this->competition->get_by_status('upcoming');
             } else {
@@ -62,16 +65,16 @@ class CompetitionController {
     }
 
     private function create_competition() {
-        // Allow all signed-in users to create competitions
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error'] = "You must be logged in to create competitions";
             header('Location: index.php?page=competitions');
-            exit;
+            return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->competition->title = $_POST['title'] ?? '';
             $this->competition->description = $_POST['description'] ?? '';
+            $this->competition->image = $_POST['image'] ?? '';
             
             // Combine date and time inputs
             $start_date = $_POST['start_date'] ?? '';
@@ -85,7 +88,7 @@ class CompetitionController {
             $voting_end_date = $_POST['voting_end_date'] ?? '';
             $voting_end_time = $_POST['voting_end_time'] ?? '23:59';
             $this->competition->voting_end_date = $voting_end_date . ' ' . $voting_end_time;
-            
+
             $this->competition->created_by = $_SESSION['user_id'];
 
             // Validate dates: start_date < end_date < voting_end_date
@@ -108,7 +111,7 @@ class CompetitionController {
             if ($this->competition->create()) {
                 $_SESSION['success'] = "Competition created successfully";
                 header('Location: index.php?page=competitions');
-                exit;
+                return;
             } else {
                 $_SESSION['error'] = "Failed to create competition";
             }
@@ -118,7 +121,6 @@ class CompetitionController {
     }
 
     private function view_competition() {
-        // This function views a specific competition
         if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
             $_SESSION['error'] = "Invalid competition ID";
             header('Location: index.php?page=competitions');
@@ -133,8 +135,9 @@ class CompetitionController {
         }
 
         // Load recipes for this competition
+        $recipes = $this->competition->get_recipes($_GET['id']);
         $recipe = new Recipe($this->conn);
-        $recipes = $recipe->get_by_competition($_GET['id']);
+        $user_recipes = $recipe->get_by_user($_SESSION['user_id']);
         
         // Get the global logged_in variable
         global $logged_in;
@@ -202,7 +205,7 @@ class CompetitionController {
             if ($this->competition->update($_GET['id'], $title, $description, $start_date_time, $end_date_time, $voting_end_date_time, $status)) {
                 $_SESSION['success'] = "Competition updated successfully";
                 header('Location: index.php?page=competitions');
-                exit;
+                return;
             } else {
                 $_SESSION['error'] = "Failed to update competition";
             }
@@ -300,15 +303,51 @@ class CompetitionController {
                 $_SESSION['error'] = "Failed to submit recipe to competition";
             }
         }
-        
-        // If this is an AJAX request, only return the modal content
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
-            include 'views/competitions/submit_recipe.php';
+
+        header('Location: index.php?page=competitions&action=view&id=' . $competition_id);
+    }
+
+    private function withdraw_recipe() {
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['error'] = "You must be logged in to withdraw a recipe";
+            header('Location: index.php?page=auth&action=login');
             exit;
         }
+
+        // Check for valid competition ID
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+            $_SESSION['error'] = "Invalid competition ID";
+            header('Location: index.php?page=competitions');
+            exit;
+        }
+
+        $competition_id = $_GET['id'];
+        $competition = $this->competition->get_by_id($competition_id);
         
-        // Otherwise include the full page with the modal
-        include 'views/competitions/submit_recipe.php';
+        if (!$competition) {
+            $_SESSION['error'] = "Competition not found";
+            header('Location: index.php?page=competitions');
+            exit;
+        }
+
+        // Check if competition is still in submission phase
+        if ($competition['status'] != 'active') {
+            $_SESSION['error'] = "You can only withdraw recipes from active competitions";
+            header('Location: index.php?page=competitions&action=view&id=' . $competition_id);
+            exit;
+        }
+
+        // Remove the recipe from the competition
+        $recipe = new Recipe($this->conn);
+        if ($recipe->withdraw_from_competition($competition_id, $_SESSION['user_id'])) {
+            $_SESSION['success'] = "Your recipe has been withdrawn from the competition";
+        } else {
+            $_SESSION['error'] = "Failed to withdraw your recipe from the competition";
+        }
+        
+        header('Location: index.php?page=competitions&action=view&id=' . $competition_id);
+        exit;
     }
 }
 ?>

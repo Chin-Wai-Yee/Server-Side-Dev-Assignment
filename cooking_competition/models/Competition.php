@@ -2,11 +2,15 @@
 class Competition {
     private $conn;
     private $table = 'competitions';
+    private $comp_recipe_table = 'competition_recipes';
+    private $recipe_table = 'recipes';
+    private $vote_table = 'votes';
     
     // Competition properties
     public $id;
     public $title;
     public $description;
+    public $image;
     public $start_date;
     public $end_date;
     public $voting_end_date;
@@ -23,6 +27,7 @@ class Competition {
         // Clean data
         $this->title = htmlspecialchars(strip_tags($this->title));
         $this->description = htmlspecialchars(strip_tags($this->description));
+        $this->image = htmlspecialchars(strip_tags($this->image)); // Clean image
         $this->start_date = htmlspecialchars(strip_tags($this->start_date));
         $this->end_date = htmlspecialchars(strip_tags($this->end_date));
         $this->voting_end_date = htmlspecialchars(strip_tags($this->voting_end_date));
@@ -30,15 +35,16 @@ class Competition {
         $this->created_by = htmlspecialchars(strip_tags($this->created_by)); // Clean created_by
         
         // Prepare query
-        $query = "INSERT INTO {$this->table} (title, description, start_date, end_date, voting_end_date, status, created_by) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO {$this->table} (title, description, image, start_date, end_date, voting_end_date, status, created_by) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->conn->prepare($query);
         
         // Bind parameters
-        $stmt->bind_param("sssssss", 
+        $stmt->bind_param("ssssssss", 
             $this->title, 
             $this->description, 
+            $this->image,
             $this->start_date, 
             $this->end_date, 
             $this->voting_end_date, 
@@ -112,6 +118,46 @@ class Competition {
             ];
         }
         return false;
+    }
+
+    public function get_recipes($competition_id = null, $order_by = 'vote_count') {
+        if ($competition_id == null) {
+            $competition_id = $this->id;
+        }
+
+        switch ($order_by) {
+            case 'vote_count':
+                $order_by = 'vote_count';
+                break;
+            case 'submitted_at':
+                $order_by = 'cr.submitted_at';
+                break;
+            default:
+                $order_by = 'vote_count';
+        }
+
+        $query = "SELECT r.*, cr.id as comp_recipe_id, u.username, 
+                    (SELECT COUNT(*) FROM votes v WHERE v.recipe_id = cr.id) as vote_count
+                    FROM {$this->comp_recipe_table} cr
+                    JOIN {$this->recipe_table} r ON cr.recipe_id = r.recipe_id
+                    LEFT JOIN users u ON r.user_id = u.user_id
+                    WHERE cr.competition_id = ?
+                    GROUP BY cr.id
+                    ORDER BY {$order_by} DESC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $competition_id);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        
+        $recipes = [];
+        while ($row = $result->fetch_assoc()) {
+            $recipes[] = $row;
+        }
+        
+        $stmt->close();
+        return $recipes;
     }
     
     // Update competition
@@ -272,7 +318,7 @@ class Competition {
                    LIMIT 1) as winner_recipe_title,
                   (SELECT u.username FROM competition_recipes cr 
                    JOIN recipes r ON cr.recipe_id = r.recipe_id
-                   JOIN users u ON r.user_id = u.id
+                   JOIN users u ON r.user_id = u.user_id
                    JOIN votes v ON cr.id = v.recipe_id
                    WHERE cr.competition_id = c.id
                    GROUP BY cr.id

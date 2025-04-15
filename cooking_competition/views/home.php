@@ -9,6 +9,9 @@
             <a href="index.php?page=competitions" class="btn btn-primary">All Competitions</a>
         </div>
     <?php endif; ?>
+    <div class="mt-3">
+        <a href="../" class="btn btn-outline-secondary">← Back to Home</a>
+    </div>
 
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success">

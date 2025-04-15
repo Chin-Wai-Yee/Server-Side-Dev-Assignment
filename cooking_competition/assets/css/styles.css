@@ -17,7 +17,7 @@ main {
 }
 
 /* Recipe Card Styles */
-.recipe-card {
+.floating-card {
   transition: all 0.3s ease;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -25,31 +25,14 @@ main {
   overflow: hidden;
 }
 
-.recipe-card:hover {
+.floating-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-.recipe-card img {
+.floating-card img {
   height: 200px;
   object-fit: cover;
-}
-
-/* Animation for modal */
-.modal.fade .modal-dialog {
-  transition: transform 0.3s ease-out;
-  transform: scale(0.8);
-}
-
-.modal.show .modal-dialog {
-  transform: scale(1);
-}
-
-/* Recipe modal content */
-.recipe-modal-content img {
-  max-width: 100%;
-  border-radius: 8px;
-  margin-bottom: 20px;
 }
 
 .loading-spinner {
@@ -67,8 +50,4 @@ main {
   100% {
     transform: translateY(0px);
   }
-}
-
-.float-animation {
-  animation: float 3s ease-in-out infinite;
 }
