@@ -4,6 +4,7 @@
             session_start();
         }
     ?>
+    <meta charset="UTF-8">
     <nav>
         <ul>
             <?php $base_path = '/recipe culinary'; ?>
