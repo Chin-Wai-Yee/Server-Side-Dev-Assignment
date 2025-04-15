@@ -8,6 +8,9 @@
     <nav>
         <ul>
             <?php $base_path = '/recipe culinary'; ?>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                <li> <a href="<?= $base_path ?>/users/admin_dashboard.php">Dashboard</a> </li>
+            <?php endif; ?>
             <li> <a href="<?= $base_path ?>">Home</a> </li>
             <div class="dropdown">
                 <li> <a href="<?= $base_path ?>/recipes">Recipes</a> </li>
