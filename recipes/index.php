@@ -10,10 +10,10 @@ $search_term = '';
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search_term = trim($_GET['search']);
     // Modified query to show only recipes created by the logged-in user
-    $sql = "SELECT * FROM recipes WHERE user_id = $user_id AND title LIKE '%$search_term%'";
+    $sql = "SELECT * FROM recipes WHERE title LIKE '%$search_term%'";
 } else {
     // Modified query to show only recipes created by the logged-in user
-    $sql = "SELECT * FROM recipes WHERE user_id = $user_id";
+    $sql = "SELECT * FROM recipes";
 }
 
 $result = $conn->query($sql);
