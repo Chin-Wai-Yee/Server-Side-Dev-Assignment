@@ -12,10 +12,17 @@ require_once 'User.php';
 
 // Create user object
 $user = new User();
-$user->user_id = $_SESSION['user_id'];
+$user->user_id = $_SESSION['user_id'];  // Get the user ID from session
 
 // Load user data
 $user->read_single();
+
+// Fetch user's recipes
+$sql = "SELECT * FROM recipes WHERE user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$recipes_result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -88,10 +95,23 @@ $user->read_single();
                         <h3>My Recipes</h3>
                     </div>
                     <div class="card-body">
-                        <p>You haven't shared any recipes yet.</p>
-                        <a href="../recipes/add_recipe.php" class="btn btn-success">
-                            <i class="fas fa-plus"></i> Add Your First Recipe
-                        </a>
+                        <?php if($recipes_result->num_rows > 0): ?>
+                            <ul class="list-group">
+                                <?php while ($recipe = $recipes_result->fetch_assoc()): ?>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <a href="../recipes/recipe_detail.php?recipe_id=<?= $recipe['recipe_id']; ?>">
+                                            <?= htmlspecialchars($recipe['title']); ?>
+                                        </a>
+
+                                    </li>
+                                <?php endwhile; ?>
+                            </ul>
+                        <?php else: ?>
+                            <p>You haven't shared any recipes yet.</p>
+                            <a href="../recipes/add_recipe.php" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add Your First Recipe
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -105,7 +125,7 @@ $user->read_single();
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Recipes Shared
-                                <span class="badge bg-primary rounded-pill">0</span>
+                                <span class="badge bg-primary rounded-pill"><?= $recipes_result->num_rows; ?></span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Comments
