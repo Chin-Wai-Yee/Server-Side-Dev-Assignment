@@ -3,13 +3,19 @@ session_start();
 require '../database.php';  // DB connection
 require '../users/require_login.php';
 
+// Assuming the user ID is stored in the session after login
+$user_id = $_SESSION['user_id'];  // Replace with the actual user ID from your session
+
 $search_term = '';
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search_term = trim($_GET['search']);
-    $sql = "SELECT * FROM recipes WHERE title LIKE '%$search_term%'";
+    // Modified query to show only recipes created by the logged-in user
+    $sql = "SELECT * FROM recipes WHERE user_id = $user_id AND title LIKE '%$search_term%'";
 } else {
-    $sql = "SELECT * FROM recipes";
+    // Modified query to show only recipes created by the logged-in user
+    $sql = "SELECT * FROM recipes WHERE user_id = $user_id";
 }
+
 $result = $conn->query($sql);
 ?>
 
@@ -20,7 +26,6 @@ $result = $conn->query($sql);
     <title>Recipe Management</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
 </head>
 <body>
     <?php include '../header.php'; ?>
