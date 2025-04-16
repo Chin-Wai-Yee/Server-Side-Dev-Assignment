@@ -18,7 +18,7 @@
                     <a href="<?= $base_path ?>/recipes/add_recipe.php">Create Recipe</a>
                     <a href="<?= $base_path ?>/recipes/edit_recipe.php?recipe_id=2">Edit Recipe</a>
                     <a href="<?= $base_path ?>/recipes/delete_recipe.php">Delete Recipe</a>
-                    <a href="<?= $base_path ?>/recipes/recipe.php#search-bar">Search Recipe</a>
+                    <a href="<?= $base_path ?>/recipes/index.php#search-bar">Search Recipe</a>
                 </div>
             </div>
             <li> <a href="<?= $base_path ?>/meal_planner/meal_planner_page.php">Meal Planning</a> </li>
