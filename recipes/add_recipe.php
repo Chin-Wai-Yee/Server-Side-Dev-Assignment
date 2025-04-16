@@ -16,6 +16,8 @@ if (isset($_GET['status'])) {
     }
 }
 
+$user_id = $_SESSION['user_id'];
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = $_POST['title'];
     $ingredients = $_POST['ingredients'];
@@ -29,8 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         mkdir('uploads', 0777, true);
     }
 
-    $query = "INSERT INTO recipes (title, ingredients, instructions, cuisine_type, image_path) 
-              VALUES ('$title', '$ingredients', '$instructions', '$cuisine_type', '$target')";
+    $query = "INSERT INTO recipes (user_id, title, ingredients, instructions, cuisine_type, image_path) 
+              VALUES ('$user_id', '$title', '$ingredients', '$instructions', '$cuisine_type', '$target')";
     $result = mysqli_query($conn, $query);
 
     if ($result && move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
@@ -41,6 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit();
     }
 }
+
+
+
 ?>
 
 
