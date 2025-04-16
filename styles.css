@@ -9,6 +9,8 @@ html, body {
     flex-direction: column;
 }
 
+
+
 .container {
     width: 100%;  /* Full width */
     margin: 0 auto;
@@ -535,53 +537,7 @@ body.community-page {
     margin: 0;
 }
 
-.community-header {
-    background-color: #2d2d2d;  /* Slightly lighter grey */
-    padding: 2rem;
-    border-radius: 8px;
-    max-width: 800px;  /* Control form width */
-    margin: 50px auto;  /* Center the form */
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-}
 
-.community-header .form-control {
-    background-color: #333;
-    border: 1px solid #444;
-    color: #fff;
-}
-
-.community-header .form-control:focus {
-    background-color: #404040;
-    border-color: #555;
-    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
-}
-
-.community-header .action-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-}
-
-.community-header .action-button{
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    margin: 0 5px;
-    border-radius: 4px; 
-    transition: all 0.2s ease;
-    display: inline-block; 
-    min-width: 120px;    
-}
-
-.community-header .cancel-button {
-    background-color: #555 !important;
-    border: 1px solid #666;
-}
-
-/* Hover effects */
-.community-header .action-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
 
 /* Make both buttons consistent */
 .button-container .action-button {
@@ -651,6 +607,7 @@ body.view-page {
     color: #ffffff;  /* White text */
     min-height: 100vh;
     margin: 0;
+    flex: 1;
 }
 
 
@@ -661,6 +618,7 @@ body.view-page {
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     display: block;
+    flex: 1;
 }
 
 .rd-discussion-card {
@@ -1137,3 +1095,4 @@ body.view-page {
     background-color: rgba(255, 107, 107, 0.2);
     color: #ff4f4f;
 }
+

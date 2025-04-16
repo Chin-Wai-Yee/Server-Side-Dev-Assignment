@@ -12,6 +12,8 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -34,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['media']) && $_FILES['media']['error'] === UPLOAD_ERR_OK) {
             $allowed_types = ['image/jpeg', 'image/png', 'video/mp4'];
             $file_type = mime_content_type($_FILES['media']['tmp_name']);
-
+        
             if (in_array($file_type, $allowed_types)) {
                 $upload_dir = __DIR__ . '/../../uploads/discussion_media/';
                 if (!is_dir($upload_dir)) {
@@ -43,13 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $file_name = uniqid() . '_' . basename($_FILES['media']['name']);
                 move_uploaded_file($_FILES['media']['tmp_name'], $upload_dir . $file_name);
                 $media_path = 'uploads/discussion_media/' . $file_name;
+            } else {
+                throw new Exception("Invalid file type. Only JPG, PNG, and MP4 files are allowed.");
             }
+        } elseif (isset($_FILES['media']) && $_FILES['media']['error'] !== UPLOAD_ERR_NO_FILE) {
+            throw new Exception("Error uploading file. Please try again.");
         }
 
         if (!$user_id) {
             throw new Exception("User not logged in. Cannot post discussion.");
         }
 
+        // Insert discussion into the database
         $stmt = $conn->prepare("INSERT INTO discussions 
                               (user_id, recipe_id, title, content, media_path)
                               VALUES (?, ?, ?, ?, ?)");

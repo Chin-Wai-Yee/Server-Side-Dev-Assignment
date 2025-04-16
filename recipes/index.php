@@ -21,12 +21,14 @@ $result = $conn->query($sql);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Recipe Management</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
+
 <body>
     <?php include '../header.php'; ?>
 
@@ -73,14 +75,19 @@ $result = $conn->query($sql);
         </div>
     </div>
 
-    <?php include '../footer.php'; ?>
+
 
     <script>
         function scrollToSearch() {
             const anchor = document.getElementById("search-bar");
-            if (anchor) anchor.scrollIntoView({ behavior: "smooth" });
+            if (anchor) anchor.scrollIntoView({
+                behavior: "smooth"
+            });
             return true;
         }
     </script>
+
+    <?php include '../footer.php'; ?>
 </body>
+
 </html>

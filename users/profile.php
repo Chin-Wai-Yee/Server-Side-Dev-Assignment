@@ -23,6 +23,14 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $recipes_result = $stmt->get_result();
+
+// Fetch user's comments count
+$sql_comments = "SELECT COUNT(*) as comment_count FROM comments WHERE user_id = ?";
+$stmt_comments = $conn->prepare($sql_comments);
+$stmt_comments->bind_param("i", $_SESSION['user_id']);
+$stmt_comments->execute();
+$comments_result = $stmt_comments->get_result();
+$comments_count = $comments_result->fetch_assoc()['comment_count'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +137,7 @@ $recipes_result = $stmt->get_result();
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Comments
-                                <span class="badge bg-primary rounded-pill">0</span>
+                                <span class="badge bg-primary rounded-pill"><?= $comments_count; ?></span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Favorites
