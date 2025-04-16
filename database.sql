@@ -20,7 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `recipe_culinary`
 --
-
+CREATE DATABASE IF NOT EXISTS `recipe_culinary` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `recipe_culinary`;
 -- --------------------------------------------------------
 
 --
