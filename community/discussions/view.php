@@ -50,6 +50,15 @@ function getComments($parentId = null)
     // Handle null user ID by creating a bindable variable
     $user_id_param = $current_user_id ?? 0;
 
+    // Determine sorting order based on the 'sort' parameter
+    $sort = $_GET['sort'] ?? 'best';
+    $orderBy = match ($sort) {
+        'new' => 'c.created_at DESC',
+        'old' => 'c.created_at ASC',
+        'best' => 'votes DESC, c.created_at DESC', // Sort by votes first, then by creation time
+        default => 'votes DESC, c.created_at DESC', // Default to "best"
+    };
+
     $sql = "SELECT c.*, 
             UNIX_TIMESTAMP(c.created_at) as created_timestamp,
             u.username,
@@ -62,7 +71,7 @@ function getComments($parentId = null)
             WHERE c.discussion_id = ? AND c.parent_comment_id " .
         ($parentId ? "= ?" : "IS NULL") . "
             GROUP BY c.comment_id
-            ORDER BY votes DESC, c.created_at DESC";
+            ORDER BY $orderBy";
 
     $stmt = $conn->prepare($sql);
 
@@ -118,6 +127,7 @@ function timeElapsed($timestamp)
 }
 
 include __DIR__ . '/../../header.php';
+
 ?>
 
 <link rel="stylesheet" href="/recipe%20culinary/styles.css">
@@ -199,15 +209,15 @@ include __DIR__ . '/../../header.php';
         </div>
 
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-alert">
-                <?= htmlspecialchars($_SESSION['error']) ?>
-                <button onclick="this.parentElement.remove()">×</button>
-            </div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-
         <div class="rd-comment-container" id="comments">
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="error-alert" style="margin-top: 10px; color: #ff4f4f; font-size: 14px;">
+                    <?= htmlspecialchars($_SESSION['error']) ?>
+                    <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #ff4f4f; cursor: pointer;">×</button>
+                </div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+
             <?php if ($logged_in): ?>
                 <div class="rd-comment-form">
                     <form action="<?= $base_path ?>/community/comments/create.php" method="post">
@@ -222,16 +232,6 @@ include __DIR__ . '/../../header.php';
                     <p style="color: #d7dadc;">Please <a href="/recipe%20culinary/login.php" style="color: #4fbcff;">log in</a> to leave a comment.</p>
                 </div>
             <?php endif; ?>
-
-            <div class="rd-sort-options">
-                <span>Sort by:</span>
-                <select id="rd-comment-sort">
-                    <option value="best">Best</option>
-                    <option value="new">New</option>
-                    <option value="old">Old</option>
-                    <option value="controversial">Controversial</option>
-                </select>
-            </div>
 
             <?php
             function renderComments($comments, $depth = 0)
@@ -332,12 +332,6 @@ include __DIR__ . '/../../header.php';
     function hideReplyForm(commentId) {
         document.getElementById('rd-reply-form-' + commentId).style.display = 'none';
     }
-
-    document.getElementById('rd-comment-sort').addEventListener('change', function() {
-        // You can implement sorting functionality here if desired
-        // For now, just reload the page to keep it simple
-        location.reload();
-    });
 
     // Add AJAX-based editing functionality for comments
     $(document).on('click', '.edit-comment-btn', function() {
