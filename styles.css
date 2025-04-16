@@ -1096,3 +1096,44 @@ body.view-page {
     color: #ff4f4f;
 }
 
+.rd-edit-form {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #2c2f33;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+.rd-edit-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #1a1a1a;
+    color: #fff;
+    resize: vertical;
+}
+
+.rd-edit-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.rd-save-btn, .rd-cancel-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.rd-save-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.rd-cancel-btn {
+    background-color: #f44336;
+    color: white;
+}

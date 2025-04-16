@@ -123,8 +123,8 @@ include __DIR__ . '/../../header.php';
 <link rel="stylesheet" href="/recipe%20culinary/styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<body class="view-page">
-    <div class="rd-container">
+<body class="view-page" style="display: flex; flex-direction: column; min-height: 100vh;">
+    <div class="rd-container" style="flex: 1;">
         <div class="rd-discussion-card">
             <div class="rd-discussion-header">
                 Posted by u/<?= htmlspecialchars($discussion['username'] ?? 'Unknown') ?> • <?= timeElapsed($discussion['created_timestamp']) ?>
@@ -273,14 +273,14 @@ include __DIR__ . '/../../header.php';
                                 <span class="rd-comment-time"><?= timeElapsed($comment['created_timestamp']) ?></span>
                             </div>
 
-                            <div class="rd-comment-text">
+                            <div class="rd-comment-text" id="comment-text-<?= $comment['comment_id'] ?>">
                                 <?= nl2br(htmlspecialchars($comment['content'] ?? '[Comment deleted]')) ?>
                             </div>
 
                             <div class="rd-comment-actions">
                                 <a href="#reply" onclick="showReplyForm(<?= $comment['comment_id'] ?>)"><i class="far fa-comment"></i> Reply</a>
                                 <?php if ($current_user_id && $current_user_id == $comment['user_id']): ?>
-                                    <a href="/recipe%20culinary/community/comments/edit.php?id=<?= $comment['comment_id'] ?>"><i class="far fa-edit"></i> Edit</a>
+                                    <a href="javascript:void(0)" class="edit-comment-btn" data-comment-id="<?= $comment['comment_id'] ?>"><i class="far fa-edit"></i> Edit</a>
                                     <a href="/recipe%20culinary/community/comments/delete.php?id=<?= $comment['comment_id'] ?>" onclick="return confirm('Are you sure you want to delete this comment?')"><i class="far fa-trash-alt"></i> Delete</a>
                                 <?php endif; ?>
                             </div>
@@ -318,8 +318,11 @@ include __DIR__ . '/../../header.php';
             ?>
         </div>
     </div>
-    <?php include __DIR__ . '/../../footer.php'; ?>
+    
 </body>
+
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
     function showReplyForm(commentId) {
@@ -335,4 +338,60 @@ include __DIR__ . '/../../header.php';
         // For now, just reload the page to keep it simple
         location.reload();
     });
+
+    // Add AJAX-based editing functionality for comments
+    $(document).on('click', '.edit-comment-btn', function() {
+        const commentId = $(this).data('comment-id');
+        const commentTextElement = $(`#comment-text-${commentId}`);
+        const originalContent = commentTextElement.text().trim(); // Trim spaces around the text
+
+        // Replace comment text with a textarea for editing
+        commentTextElement.html(
+            `<textarea id="edit-textarea-${commentId}" class="edit-textarea" style="width: 90%; height: 80px;">${originalContent}</textarea>` +
+            `<div style="margin-top: 10px;">` +
+            `<button class="save-edit-btn" data-comment-id="${commentId}" style="margin-right: 5px;">Save</button>` +
+            `<button class="cancel-edit-btn" data-comment-id="${commentId}">Cancel</button>` +
+            `</div>`
+        );
+
+        // Handle save button click
+        $(document).on('click', `.save-edit-btn[data-comment-id="${commentId}"]`, function() {
+            const updatedContent = $(`#edit-textarea-${commentId}`).val();
+
+            // Ensure the CSRF token is included in the AJAX request
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            if (!csrfToken) {
+                console.error('CSRF token is missing from the page.');
+            }
+
+            $.ajax({
+                url: '/recipe%20culinary/community/comments/edit.php',
+                method: 'POST',
+                data: {
+                    ajax: true,
+                    comment_id: commentId,
+                    content: updatedContent,
+                    csrf_token: csrfToken
+                },
+                success: function(response) {
+                    if (response.success) {
+                        commentTextElement.html(response.updated_content); // Server sends already escaped and <br> converted content
+                    } else {
+                        alert(response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                    alert('An error occurred while saving the comment. Please try again.');
+                }
+            });
+        });
+
+        // Handle cancel button click
+        $(document).on('click', `.cancel-edit-btn[data-comment-id="${commentId}"]`, function() {
+            commentTextElement.text(originalContent);
+        });
+    });
 </script>
+<?php include __DIR__ . '/../../footer.php'; ?>

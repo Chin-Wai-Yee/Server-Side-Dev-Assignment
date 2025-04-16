@@ -3,8 +3,14 @@
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
+
+        // Ensure CSRF token is generated and add it as a meta tag
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
     ?>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
     <nav>
         <ul>
             <?php $base_path = '/recipe culinary'; ?>
