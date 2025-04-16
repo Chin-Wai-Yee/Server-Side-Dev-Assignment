@@ -233,6 +233,11 @@ $result = $stmt->get_result();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        function editUser(userId) {
+            // Redirect to the edit_user.php page with the user ID as a parameter
+            window.location.href = 'edit_user.php?user_id=' + userId;
+        }
+        
         function deleteUser(userId) {
             if (confirm("Are you sure you want to delete this user?")) {
                 // Create an AJAX request
