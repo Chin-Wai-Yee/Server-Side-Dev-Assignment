@@ -211,6 +211,13 @@ class Competition {
         // Clean data
         $id = htmlspecialchars(strip_tags($id));
         
+        // Get competition details to find the image
+        $this->id = $id;
+        if ($this->read_single() && !empty($this->image) && file_exists($this->image)) {
+            // Delete the image file
+            unlink($this->image);
+        }
+        
         // Prepare query
         $query = "DELETE FROM {$this->table} WHERE id = ?";
         
