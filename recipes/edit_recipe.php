@@ -65,8 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $recipe) {
     $update_stmt = $conn->prepare($update_query);
 
     if (!empty($image)) {
-        $update_stmt->bind_param("sssssi", $title, $ingredients, $instructions, $cuisine_type, $target, $recipe_id, $user_id);
+        // When $update_image is included, there are 6 placeholders
+        $update_stmt->bind_param("ssssssi", $title, $ingredients, $instructions, $cuisine_type, $target, $recipe_id, $user_id);
     } else {
+        // When $update_image is not included, there are 5 placeholders
         $update_stmt->bind_param("ssssi", $title, $ingredients, $instructions, $cuisine_type, $recipe_id, $user_id);
     }
 
@@ -93,11 +95,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $recipe) {
 
 <div class="addrecipe-header">
     <h2 class="addrecipe-title" style="text-align:center; font-size:48px; font-family: 'Didot', serif; color: lightyellow; ">Edit Recipe</h2>
-
-    <div class="addrecipe-container">
-        <?php if ($feedback != ''): ?>
+    <?php if ($feedback != ''): ?>
             <p class="feedback-message <?php echo $feedback_class; ?>"><?php echo $feedback; ?></p>
         <?php endif; ?>
+    <div class="addrecipe-container">
+        
 
         <?php if ($recipe): ?>
         <form action="edit_recipe.php?recipe_id=<?php echo $recipe_id; ?>" method="POST" enctype="multipart/form-data">
