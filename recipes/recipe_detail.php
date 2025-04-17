@@ -13,6 +13,22 @@ if ($result->num_rows == 1) {
     echo "Recipe not found.";
     exit;
 }
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete_recipe') {
+    $recipe_id = $_POST['recipe_id'];
+
+    // Perform deletion
+    $sql = "DELETE FROM recipes WHERE recipe_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $recipe_id);
+    
+    if ($stmt->execute()) {
+        echo "Recipe deleted successfully.";
+    } else {
+        echo "Failed to delete recipe.";
+    }
+    exit(); // Prevent page from refreshing after the AJAX request
+}
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +67,7 @@ if ($result->num_rows == 1) {
             if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $recipe['user_id']): ?>
                 <div class="recipe-actions mb-3">
                     <a href="edit_recipe.php?recipe_id=<?php echo $recipe['recipe_id']; ?>" class="btn btn-primary btn-sm me-2">Edit</a>
-                    <a href="delete_recipe.php?recipe_id=<?php echo $recipe['recipe_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this recipe?');">Delete</a>
+                    <a href="#" class='btn btn-danger btn-sm' onclick='deleteRecipe(<?php echo $recipe["recipe_id"]; ?>)'>Delete</a>
                 </div>
             <?php endif; ?>
                 <h3>Cuisine Type:</h3>
@@ -78,5 +94,24 @@ if ($result->num_rows == 1) {
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+<script>
+    function deleteRecipe(recipeId) {
+        if (confirm("Are you sure you want to delete this recipe?")) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send("action=delete_recipe&recipe_id=" + recipeId);
+
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    alert("Recipe deleted successfully!");
+                    window.location.href = "index.php";
+                } else {
+                    alert("Failed to delete recipe.");
+                }
+            };
+        }
+    }
+</script>
 </body>
 </html>
