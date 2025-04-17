@@ -74,7 +74,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
 </head>
 <body>
-    <?php include '../header.php'; ?>
+<?php 
+    include '../header.php'; 
+
+?>
+
 
     <div class="addrecipe-header">
         <h2 class="addrecipe-title">Edit Recipe</h2>
