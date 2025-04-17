@@ -167,7 +167,13 @@ body {
 </head>
 <body>
 
-    <?php include '../header.php'; ?>
+<?php 
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): 
+    include '../admin_header.php'; 
+else: 
+    include '../header.php'; 
+endif; 
+?>
 
     <div class="container my-5">
         <h1 style="color:lightyellow;">Edit User</h1>
