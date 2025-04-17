@@ -1,6 +1,7 @@
 <?php
 session_start();
 require '../database.php';  // DB connection
+require '../users/require_login.php';
 
 // Handle search functionality
 $search_term = '';
