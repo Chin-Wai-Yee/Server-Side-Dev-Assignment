@@ -19,8 +19,6 @@
                 <li> <a href="<?= $base_path ?>/recipes">Recipes</a> </li>
                 <div class="dropdown-content">
                     <a href="<?= $base_path ?>/recipes/add_recipe.php">Create Recipe</a>
-                    <a href="<?= $base_path ?>/recipes/edit_recipe.php?recipe_id=2">Edit Recipe</a>
-                    <a href="<?= $base_path ?>/recipes/delete_recipe.php">Delete Recipe</a>
                     <a href="<?= $base_path ?>/recipes/index.php#search-bar">Search Recipe</a>
                 </div>
             </div>
