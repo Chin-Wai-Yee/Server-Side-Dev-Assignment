@@ -155,10 +155,42 @@ $result = $stmt->get_result();
         .btn-danger:hover {
             background-color: #c82333;
         }
+
+        nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    background-color: #8E2C2B;
+    position: relative;
+}
+
+nav ul li {
+    position: relative; /* Needed for dropdown positioning */
+    margin: 0 20px;
+}
+
+nav ul li a {
+    color: lightyellow;
+    text-decoration: none;
+    font-size: 1.1em;
+    font-family: 'Didot', serif;
+    text-align: center;
+    /* padding: 10px 15px; */
+    display: block;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
     </style>
 <body>
     <!-- Include header -->
-    <?php include '../header.php'; ?>
+    <?php include '../admin_header.php';?>
+
 
     <div class="container my-5">
         <h1 style="color:lightyellow;">Admin Dashboard</h1>

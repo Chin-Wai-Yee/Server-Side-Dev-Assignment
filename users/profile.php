@@ -45,11 +45,17 @@ $comments_count = $comments_result->fetch_assoc()['comment_count'] ?? 0;
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <?php include_once '../header.php'; ?>
+<?php 
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): 
+    include '../admin_header.php'; 
+else: 
+    include '../header.php'; 
+endif; 
+?>
 
-    <div class="container my-5 pb-5">
-        <div class="row">
-            <div class="col-md-8 mb-4">
+    <div class="container d-flex justify-content-center align-items-center" >
+        <div class="row w-100">
+            <div class="col-md-8 mx-auto">
                 <div class="card">
                     <div class="card-header">
                         <h3>Your Profile</h3>
@@ -98,54 +104,31 @@ $comments_count = $comments_result->fetch_assoc()['comment_count'] ?? 0;
                     </div>
                 </div>
                 
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h3>My Recipes</h3>
+                <?php if ($_SESSION['role'] === 'user'): ?>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h3>My Recipes</h3>
+                        </div>
+                        <div class="card-body">
+                            <?php if ($recipes_result->num_rows > 0): ?>
+                                <ul class="list-group">
+                                    <?php while ($recipe = $recipes_result->fetch_assoc()): ?>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="../recipes/recipe_detail.php?recipe_id=<?= $recipe['recipe_id']; ?>">
+                                                <?= htmlspecialchars($recipe['title']); ?>
+                                            </a>
+                                        </li>
+                                    <?php endwhile; ?>
+                                </ul>
+                            <?php else: ?>
+                                <p>You haven't shared any recipes yet.</p>
+                                <a href="../recipes/add_recipe.php" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Add Your First Recipe
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <?php if($recipes_result->num_rows > 0): ?>
-                            <ul class="list-group">
-                                <?php while ($recipe = $recipes_result->fetch_assoc()): ?>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <a href="../recipes/recipe_detail.php?recipe_id=<?= $recipe['recipe_id']; ?>">
-                                            <?= htmlspecialchars($recipe['title']); ?>
-                                        </a>
-
-                                    </li>
-                                <?php endwhile; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p>You haven't shared any recipes yet.</p>
-                            <a href="../recipes/add_recipe.php" class="btn btn-success">
-                                <i class="fas fa-plus"></i> Add Your First Recipe
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Account Stats</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Recipes Shared
-                                <span class="badge bg-primary rounded-pill"><?= $recipes_result->num_rows; ?></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Comments
-                                <span class="badge bg-primary rounded-pill"><?= $comments_count; ?></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Favorites
-                                <span class="badge bg-primary rounded-pill">0</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

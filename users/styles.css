@@ -30,6 +30,7 @@ body {
   background-size: cover;  /* Cover the entire viewport */
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   min-height: 100vh;  /* Ensure the body covers the full height of the viewport */
   display: flex;
   flex-direction: column;

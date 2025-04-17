@@ -30,7 +30,13 @@ $user->read_single();
     <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <?php include_once '../header.php'; ?>
+<?php 
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): 
+    include '../admin_header.php'; 
+else: 
+    include '../header.php'; 
+endif; 
+?>
 
     <div class="container my-2 pb-5">
         <div class="row justify-content-center">
