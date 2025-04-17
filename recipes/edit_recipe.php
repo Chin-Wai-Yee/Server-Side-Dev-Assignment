@@ -3,64 +3,78 @@ session_start();
 require '../database.php';  // DB connection
 require '../users/require_login.php';
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $feedback = '';
 $feedback_class = '';
 
-if (!isset($_GET['recipe_id'])) {
-    header("Location: recipe.php");
+// Validate recipe_id
+if (!isset($_GET['recipe_id']) || !is_numeric($_GET['recipe_id'])) {
+    header("Location: index.php");
     exit;
 }
 
 $recipe_id = intval($_GET['recipe_id']);
 $user_id = $_SESSION['user_id']; // Assuming user_id is stored in the session after login
 
-// Check if the recipe exists and belongs to the logged-in user
-$sql = "SELECT * FROM recipes WHERE recipe_id = $recipe_id AND user_id = $user_id";
-$result = mysqli_query($conn, $sql);
+// Fetch the recipe details
+$check_query = "SELECT * FROM recipes WHERE recipe_id = ? AND user_id = ?";
+$stmt = $conn->prepare($check_query);
+$stmt->bind_param("ii", $recipe_id, $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-if (mysqli_num_rows($result) != 1) {
-    $feedback = "No recipes found. You haven't created any recipes yet.";
+if ($result->num_rows === 0) {
+    $feedback = "You are not authorized to edit this recipe.";
     $feedback_class = "feedback-error";
-    $recipe = null; // Set recipe to null to avoid errors in the form
+    $recipe = null;
 } else {
-    $recipe = mysqli_fetch_assoc($result);
+    $recipe = $result->fetch_assoc();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && $recipe) {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $recipe) {
     $title = $_POST['title'];
     $ingredients = $_POST['ingredients'];
     $instructions = $_POST['instructions'];
     $cuisine_type = $_POST['cuisine_type'];
 
-    $image = $_FILES['image']['name'];
-    $target = "uploads/" . basename($image);
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $image = $_FILES['image']['name'];
+        $target = "uploads/" . basename($image);
 
-    if (!is_dir('uploads')) {
-        mkdir('uploads', 0777, true);
-    }
+        if (!is_dir('uploads')) {
+            mkdir('uploads', 0777, true);
+        }
 
-    if (!empty($image)) {
         move_uploaded_file($_FILES['image']['tmp_name'], $target);
-        $update_image = ", image_path = '$target'";
+        $update_image = ", image_path = ?";
     } else {
         $update_image = '';
     }
 
     $update_query = "UPDATE recipes SET 
-        title = '$title', 
-        ingredients = '$ingredients', 
-        instructions = '$instructions', 
-        cuisine_type = '$cuisine_type' 
+        title = ?, 
+        ingredients = ?, 
+        instructions = ?, 
+        cuisine_type = ? 
         $update_image 
-        WHERE recipe_id = $recipe_id AND user_id = $user_id";
+        WHERE recipe_id = ? AND user_id = ?";
 
-    if (mysqli_query($conn, $update_query)) {
+    $update_stmt = $conn->prepare($update_query);
+
+    if (!empty($image)) {
+        $update_stmt->bind_param("sssssi", $title, $ingredients, $instructions, $cuisine_type, $target, $recipe_id, $user_id);
+    } else {
+        $update_stmt->bind_param("ssssi", $title, $ingredients, $instructions, $cuisine_type, $recipe_id, $user_id);
+    }
+
+    if ($update_stmt->execute()) {
         $feedback = "Recipe updated successfully!";
         $feedback_class = "feedback-success";
-        $result = mysqli_query($conn, "SELECT * FROM recipes WHERE recipe_id = $recipe_id AND user_id = $user_id");
-        $recipe = mysqli_fetch_assoc($result);
     } else {
-        $feedback = "Failed to update the recipe.";
+        $feedback = "Failed to update the recipe. Error: " . $conn->error;
         $feedback_class = "feedback-error";
     }
 }
@@ -78,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && $recipe) {
 <?php include '../header.php'; ?>
 
 <div class="addrecipe-header">
-    <h2 class="addrecipe-title" style="text-align:center; font-size:48px; font-family: 'Didot', serif; color: lightyellow; position: absolute; top: 120px; left: 50%; transform: translateX(-50%);">Edit Recipe</h2>
+    <h2 class="addrecipe-title" style="text-align:center; font-size:48px; font-family: 'Didot', serif; color: lightyellow; ">Edit Recipe</h2>
 
     <div class="addrecipe-container">
         <?php if ($feedback != ''): ?>

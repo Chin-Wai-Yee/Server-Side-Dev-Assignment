@@ -1,22 +1,25 @@
 <?php
 session_start();
 require '../database.php';  // DB connection
-require '../users/require_login.php';
 
-// Assuming the user ID is stored in the session after login
-$user_id = $_SESSION['user_id'];  // Replace with the actual user ID from your session
-
+// Handle search functionality
 $search_term = '';
 if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search_term = trim($_GET['search']);
-    // Modified query to show only recipes created by the logged-in user
-    $sql = "SELECT * FROM recipes WHERE title LIKE '%$search_term%'";
+    // Query to show all recipes matching the search term
+    $sql = "SELECT * FROM recipes WHERE title LIKE ?";
+    $stmt = $conn->prepare($sql);
+    $search_term = '%' . $search_term . '%';
+    $stmt->bind_param("s", $search_term);
+    $stmt->execute();
+    $result = $stmt->get_result();
 } else {
-    // Modified query to show only recipes created by the logged-in user
+    // Query to show all recipes
     $sql = "SELECT * FROM recipes";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
-
-$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +27,7 @@ $result = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Management</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -34,18 +38,7 @@ $result = $conn->query($sql);
 
     <div class="recipe-header" id="top">
         <h1 style="text-shadow:4px 4px 6px rgba(255, 255, 255, 0.4);">Recipe Management</h1>
-        <h3 style="text-shadow:4px 4px 6px rgba(255, 255, 255, 0.4);">Welcome to the recipe page! Feel free to manage your recipe here. Let's create, edit, delete or search your recipe with us!</h3>
-
-        <div class="button-container">
-            <a href="add_recipe.php" class="action-button add-recipe">Add Recipe</a>
-            <a href="edit_recipe.php?recipe_id=2" class="action-button edit-recipe">Edit Recipe</a>
-            <a href="delete_recipe.php" class="action-button delete-recipe">Delete Recipe</a>
-            <a href="#search-bar" class="action-button search-recipe">Search Recipe</a>
-        </div>
-
-        <h3 style="margin-top:30px;text-shadow:4px 4px 6px rgba(255, 255, 255, 0.4);">Scroll down to see your recipe!</h3>
-
-        <h1 id="search-bar" style="margin-top:10%;text-shadow:4px 4px 6px rgba(255, 255, 255, 0.4);">Recipe List</h1>
+        <h3 style="text-shadow:4px 4px 6px rgba(255, 255, 255, 0.4);">Welcome to the recipe page! Feel free to browse all recipes here. Let's search for your favorite recipe!</h3>
 
         <!-- SEARCH BAR -->
         <form method="GET" class="search-bar-container" onsubmit="return scrollToSearch();">
@@ -57,25 +50,26 @@ $result = $conn->query($sql);
         <!-- RECIPE GRID -->
         <div class="recipe-grid">
             <?php
+            $logged_in_user_id = $_SESSION['user_id']; 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    echo "<a class='recipe-box' href='recipe_detail.php?recipe_id=" . $row['recipe_id'] . "'>";
+                    echo "<a href='recipe_detail.php?recipe_id=" . $row['recipe_id'] . "' class='recipe-box'>";
                     echo "<div class='recipe-title'>" . htmlspecialchars($row["title"]) . "</div>";
                     if (!empty($row["image_path"])) {
                         echo "<img src='" . htmlspecialchars($row["image_path"]) . "' alt='Recipe Image'>";
                     } else {
                         echo "<div class='recipe-image-placeholder'>No Image</div>";
                     }
-                    echo "</a>";
+
+                    echo "</a>";  // Closing recipe-box link
                 }
             } else {
                 echo "<p>No recipes found.</p>";
             }
             ?>
-        </div>
-    </div>
+        </div>  <!-- Closing recipe-grid div -->
 
-
+    </div>  <!-- Closing recipe-header div -->
 
     <script>
         function scrollToSearch() {
