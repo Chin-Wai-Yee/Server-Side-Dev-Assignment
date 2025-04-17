@@ -3,9 +3,6 @@ session_start();
 require '../database.php';  // DB connection
 require '../users/require_login.php';
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 $feedback = '';
 $feedback_class = '';
 
@@ -54,25 +51,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $recipe) {
         $update_image = '';
     }
 
-    $update_query = "UPDATE recipes SET 
-        title = ?, 
-        ingredients = ?, 
-        instructions = ?, 
-        cuisine_type = ? 
-        $update_image 
-        WHERE recipe_id = ? AND user_id = ?";
-
-    $update_stmt = $conn->prepare($update_query);
-
-    if (!empty($image)) {
-        // When $update_image is included, there are 6 placeholders
-        $update_stmt->bind_param("ssssssi", $title, $ingredients, $instructions, $cuisine_type, $target, $recipe_id, $user_id);
+    // Update competition in the database
+    if ($update_image) {
+        $update_query = "UPDATE recipes SET 
+            title = ?, 
+            ingredients = ?, 
+            instructions = ?, 
+            cuisine_type = ?,
+            image_path = ? 
+            WHERE recipe_id = ? AND user_id = ?";
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param("ssssssi", $title, $ingredients, $instructions, $cuisine_type, $target, $recipe_id, $user_id);
     } else {
-        // When $update_image is not included, there are 5 placeholders
-        $update_stmt->bind_param("ssssi", $title, $ingredients, $instructions, $cuisine_type, $recipe_id, $user_id);
+        $update_query = "UPDATE recipes SET 
+            title = ?, 
+            ingredients = ?, 
+            instructions = ?, 
+            cuisine_type = ? 
+            WHERE recipe_id = ? AND user_id = ?";
+        $stmt = $conn->prepare($update_query);
+        $stmt->bind_param("sssssi", $title, $ingredients, $instructions, $cuisine_type, $recipe_id, $user_id);
     }
 
-    if ($update_stmt->execute()) {
+    if ($stmt->execute()) {
         $feedback = "Recipe updated successfully!";
         $feedback_class = "feedback-success";
     } else {
