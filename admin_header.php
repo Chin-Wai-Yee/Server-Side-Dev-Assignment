@@ -14,6 +14,7 @@
     <nav>
         <ul>
             <?php $base_path = '/recipe culinary'; ?>
+            <li> <a href="<?= $base_path ?>/index.php">Home</a> </li>
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                 <li> <a href="<?= $base_path ?>/users/admin_dashboard.php">Dashboard</a> </li>
             <?php endif; ?>

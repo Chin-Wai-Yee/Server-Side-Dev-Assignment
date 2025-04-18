@@ -53,50 +53,39 @@ endif;
                             </div>
                         <?php endif; ?>
 
-                        <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($user->username) ?>" required>
+                        <form action="update_profile.php" method="POST">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($user->username) ?>" placeholder="Username" required>
+                                <label for="username">Username</label>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($user->email) ?>" required>
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($user->email) ?>" placeholder="Email" required>
+                                <label for="email">Email</label>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="bio" class="form-label">Bio</label>
-                                <textarea class="form-control" id="bio" name="bio" rows="4"><?= htmlspecialchars($user->bio) ?></textarea>
-                                <div class="form-text">Tell us about yourself, your culinary interests, and cooking style.</div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="profile_image" class="form-label">Profile Image</label>
-                                <input type="file" class="form-control" id="profile_image" name="profile_image">
-                                <?php if($user->profile_image): ?>
-                                    <div class="mt-2">
-                                        <img src="../<?= htmlspecialchars($user->profile_image) ?>" alt="Current Profile Picture" class="img-thumbnail" style="max-width: 100px;">
-                                        <div class="form-text">Your current profile picture. Upload a new one to change it.</div>
-                                    </div>
-                                <?php endif; ?>
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" id="bio" name="bio" rows="4" placeholder="Bio"><?= htmlspecialchars($user->bio) ?></textarea>
+                                <label for="bio">Bio</label>
+                                <div class="form-text mt-1">Tell us about yourself, your culinary interests, and cooking style.</div>
                             </div>
                             
                             <h4 class="mt-4">Change Password</h4>
                             <hr>
-                            <div class="mb-3">
-                                <label for="current_password" class="form-label">Current Password</label>
-                                <input type="password" class="form-control" id="current_password" name="current_password">
-                                <div class="form-text">Leave password fields blank if you don't want to change your password.</div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password">
+                                <label for="current_password">Current Password</label>
+                                <div class="form-text mt-1">Leave password fields blank if you don't want to change your password.</div>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="new_password" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="new_password" name="new_password">
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="new_password" name="new_password" placeholder="New Password">
+                                <label for="new_password">New Password</label>
                             </div>
                             
-                            <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm New Password">
+                                <label for="confirm_password">Confirm New Password</label>
                             </div>
                             
                             <div class="d-flex justify-content-between mt-4">

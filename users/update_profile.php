@@ -56,14 +56,6 @@ if($user->update_profile($username, $email, $bio)) {
         $_SESSION['username'] = $username;
     }
     
-    // Handle profile image upload if present
-    if(!empty($_FILES['profile_image']['name'])) {
-        $result = handle_image_upload($user);
-        if($result !== true) {
-            $_SESSION['error'] = $result; // $result contains error message
-        }
-    }
-    
     // Handle password change if requested
     if(!empty($_POST['current_password']) && !empty($_POST['new_password'])) {
         $result = handle_password_change($user);
