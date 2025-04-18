@@ -74,55 +74,6 @@ if($user->update_profile($username, $email, $bio)) {
 header('Location: profile.php');
 exit;
 
-// Helper function to handle image upload
-function handle_image_upload($user) {
-    // Get file info
-    $file_name = $_FILES['profile_image']['name'];
-    $file_tmp = $_FILES['profile_image']['tmp_name'];
-    $file_size = $_FILES['profile_image']['size'];
-    $file_error = $_FILES['profile_image']['error'];
-    
-    // Get file extension
-    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-    
-    // Allowed file types
-    $allowed = array('jpg', 'jpeg', 'png', 'gif');
-    
-    if(!in_array($file_ext, $allowed)) {
-        return "Invalid file type. Allowed types: jpg, jpeg, png, gif";
-    }
-    
-    if($file_error !== 0) {
-        return "Error uploading file. Error code: $file_error";
-    }
-    
-    if($file_size > 2097152) { // 2MB max
-        return "File is too large. Maximum size is 2MB";
-    }
-    
-    // Create uploads directory if it doesn't exist
-    $upload_dir = '../assets/uploads/profile_images/';
-    if(!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0777, true);
-    }
-    
-    // Generate unique filename
-    $new_filename = uniqid('profile_') . '.' . $file_ext;
-    $upload_path = $upload_dir . $new_filename;
-    
-    if(move_uploaded_file($file_tmp, $upload_path)) {
-        // Update database with new profile image path
-        $image_path = 'assets/uploads/profile_images/' . $new_filename;
-        if($user->update_profile_image($image_path)) {
-            return true;
-        } else {
-            return "Failed to update profile image in database";
-        }
-    } else {
-        return "Failed to upload image";
-    }
-}
-
 // Helper function to handle password change
 function handle_password_change($user) {
     $current_password = $_POST['current_password'];

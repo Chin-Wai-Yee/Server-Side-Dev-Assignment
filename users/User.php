@@ -10,7 +10,6 @@ class User {
     public $username;
     public $email;
     public $password;
-    public $profile_image;
     public $bio;
     public $created_at;
     public $role;
@@ -74,7 +73,6 @@ class User {
         if ($row) {
             $this->username = $row['username'];
             $this->email = $row['email'];
-            $this->profile_image = $row['profile_image'];
             $this->bio = $row['bio'];
             $this->created_at = $row['created_at'];
             $this->role = $row['role'];
@@ -98,7 +96,6 @@ class User {
             $this->user_id = $row['user_id'];
             $this->username = $row['username'];
             $this->email = $row['email'];
-            $this->profile_image = $row['profile_image'];
             $this->bio = $row['bio'];
             $this->created_at = $row['created_at'];
             return true;
@@ -121,7 +118,6 @@ class User {
             $this->user_id = $row['user_id'];
             $this->username = $row['username'];
             $this->email = $row['email'];
-            $this->profile_image = $row['profile_image'];
             $this->bio = $row['bio'];
             $this->created_at = $row['created_at'];
             return true;
@@ -145,22 +141,6 @@ class User {
             return false;
         }
         
-    }
-
-    public function update_profile_image($image_path) {
-        try {
-            $query = 'UPDATE ' . $this->table . ' 
-                      SET profile_image = ? 
-                      WHERE user_id = ?';
-
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param('si', $image_path, $this->user_id);
-
-            return $stmt->execute();
-        } catch (Exception $e) {
-            error_log("Error updating profile image: " . $e->getMessage());
-            return false;
-        }
     }
 
     public function update_password($new_password) {
