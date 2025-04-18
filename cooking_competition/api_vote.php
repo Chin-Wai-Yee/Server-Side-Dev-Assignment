@@ -17,7 +17,7 @@ $vote = new Vote($conn);
 // Check if user is logged in
 $logged_in = isset($_SESSION['user_id']);
 if (!$logged_in) {
-    echo json_encode(['status' => 'error', 'message' => 'User must be logged in']);
+    echo json_encode(['status' => 'error', 'message' => 'User must be logged in to vote!']);
     exit;
 }
 

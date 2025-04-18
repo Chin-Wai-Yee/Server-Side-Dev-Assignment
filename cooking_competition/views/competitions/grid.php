@@ -3,9 +3,14 @@
         <div class="col-md-4 mb-4" onclick="window.location.href='index.php?page=competitions&action=view&id=<?= $comp['id'] ?>'">
             <div class="card floating-card h-100">
                 <?php if (!empty($comp['image'])): ?>
-                    <img src="<?= htmlspecialchars($comp['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($comp['title']) ?>">
+                    <?php $imagePath = $comp['image']; ?>
+                    <?php if (file_exists($imagePath) || strpos($imagePath, 'http') === 0): ?>
+                        <img src="<?= htmlspecialchars($comp['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($comp['title']) ?>" onerror="this.src='assets/images/default_competition.png';">
+                    <?php else: ?>
+                        <img src="assets/images/default_competition.png" class="card-img-top" alt="Default competition image">
+                    <?php endif; ?>
                 <?php else: ?>
-                    <img src="assets\images\default_competition.png" class="card-img-top" alt="Default competition image">
+                    <img src="assets/images/default_competition.png" class="card-img-top" alt="Default competition image">
                 <?php endif; ?>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($comp['title']) ?></h5>

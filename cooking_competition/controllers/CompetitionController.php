@@ -179,8 +179,6 @@ class CompetitionController {
 
         // Load recipes for this competition
         $recipes = $this->competition->get_recipes($_GET['id']);
-        $recipe = new Recipe($this->conn);
-        $user_recipes = $recipe->get_by_user($_SESSION['user_id']);
         
         // Get winner information if competition is completed
         $winner = null;

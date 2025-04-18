@@ -24,6 +24,10 @@ main {
   position: unset !important;
 }
 
+.dropdown-content a {
+  font-family: 'inherit';
+}
+
 /* Recipe Card Styles */
 .floating-card {
   transition: all 0.3s ease;

@@ -4,9 +4,17 @@
 
 <div class="card mb-4">
     <?php if (!empty($competition['image'])): ?>
-        <img src="<?= htmlspecialchars($competition['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($competition['title']) ?>" style="max-height: 300px; object-fit: cover;">
+        <?php $imagePath = $competition['image']; ?>
+        <img src="<?= htmlspecialchars($competition['image']) ?>" 
+             class="card-img-top" 
+             alt="<?= htmlspecialchars($competition['title']) ?>" 
+             style="max-height: 300px; object-fit: cover;"
+             onerror="this.onerror=null; this.src='assets/images/default_competition.png';">
     <?php else: ?>
-        <img src="assets/images/default_competition.png" class="card-img-top" alt="Default Competition Image" style="max-height: 300px; object-fit: cover;">
+        <img src="assets/images/default_competition.png" 
+             class="card-img-top" 
+             alt="Default Competition Image" 
+             style="max-height: 300px; object-fit: cover;">
     <?php endif; ?>
 
     <div class="card-body">
@@ -147,8 +155,7 @@ if ($logged_in && $competition['status'] == 'voting') {
                         ?>
                         <button class="btn like-btn <?= $hasVoted ? 'btn-danger' : 'btn-outline-danger' ?>" 
                             data-recipe-id="<?= $recipe['comp_recipe_id'] ?>" 
-                            data-competition-id="<?= $competition['id'] ?>"
-                            <?= $logged_in ? '' : 'disabled' ?>>
+                            data-competition-id="<?= $competition['id'] ?>">
                             <i class="bi bi-heart<?= $hasVoted ? '-fill' : '' ?>"></i>
                             <span class="vote-count"><?= (new Vote($this->conn))->count_votes($recipe['comp_recipe_id']) ?></span>
                         </button>
@@ -176,12 +183,8 @@ if ($logged_in && $competition['status'] == 'voting') {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // More effectively prevent modal from opening when clicking buttons inside recipe cards
-    const cardButtons = document.querySelectorAll('.recipe-card .btn, .recipe-card button, .recipe-card a');
-
-    // Remove the click handler from the parent recipe card's data-bs-toggle attribute
+    // Setup for recipe cards and modals
     document.querySelectorAll('.recipe-card').forEach(card => {
-      // Instead of relying on data-bs-toggle, we'll manually control modal opening
       const modalId = card.getAttribute('data-bs-target');
       
       // Remove the automatic trigger
@@ -189,15 +192,14 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Add our custom click handler
       card.addEventListener('click', function(e) {
-        // Only open the modal if the click was directly on the card
-        // (not on a button/link inside the card)
-        if (e.target === this || this.contains(e.target) && 
-            !e.target.closest('.btn') && 
-            !e.target.closest('button') && 
-            !e.target.closest('a')) {
-          const modal = new bootstrap.Modal(document.querySelector(modalId));
-          modal.show();
+        // Don't open the modal if clicked on a button, link, or other interactive element
+        if (e.target.closest('.btn') || e.target.closest('button') || e.target.closest('a')) {
+          return; // Stop here - don't open modal
         }
+        
+        // Open the modal for clicks directly on the card
+        const modal = new bootstrap.Modal(document.querySelector(modalId));
+        modal.show();
       });
     });
     
@@ -206,6 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     likeButtons.forEach(button => {
         button.addEventListener('click', function(event) {
+            // Prevent the event from bubbling up to the card
+            event.stopPropagation();
+            
             if (!this.disabled) {
                 const recipeId = this.getAttribute('data-recipe-id');
                 const competitionId = this.getAttribute('data-competition-id');
@@ -243,6 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             
                         // Update vote count
                         voteCountElement.textContent = data.count;
+                    }
+                    else if (data.status == 'error') {
+                        alert(data.message);
                     }
                 })
                 .catch(error => {
